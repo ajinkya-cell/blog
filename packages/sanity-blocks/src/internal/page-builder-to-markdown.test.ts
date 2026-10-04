@@ -13,34 +13,23 @@ test("returns empty string for missing input", () => {
   expect(pageBuilderToMarkdown([])).toBe("");
 });
 
-test("serializes an FAQ block as semantic markdown, not a component tag", () => {
+test("serializes a personal hero block as semantic markdown", () => {
   const md = pageBuilderToMarkdown([
     {
-      _type: "faqAccordion",
-      title: "Questions",
-      eyebrow: "FAQ",
-      subtitle: "Helpful answers",
-      categories: [
-        {
-          _key: "cat-1",
-          title: "General",
-          faqs: [
-            { _id: "1", title: "What is this?", richText: para("An answer.") },
-            { _id: "2", title: "" }, // skipped — no title
-          ],
-        },
-      ],
-      link: { title: "More", description: "See all", href: "/faq" },
+      _type: "personalHero",
+      greeting: "Hello, I am Alex",
+      statusPill: "Active",
+      tagline: "Software builder",
+      bio: para("I write about technology."),
+      buttons: [{ _key: "b1", text: "Writing", href: "/blog" }],
     },
   ]);
 
-  expect(md).toContain("**FAQ**");
-  expect(md).toContain("## Questions");
-  expect(md).toContain("Helpful answers");
-  expect(md).toContain("### What is this?");
-  expect(md).toContain("An answer.");
-  expect(md).toContain("[See all](/faq)");
-  // The acceptance criterion: no raw <FAQComponent/> style tags.
+  expect(md).toContain("**Active**");
+  expect(md).toContain("# Hello, I am Alex");
+  expect(md).toContain("*Software builder*");
+  expect(md).toContain("I write about technology.");
+  expect(md).toContain("- [Writing](/blog)");
   expect(md).not.toMatch(/<[A-Za-z]/);
 });
 
@@ -64,26 +53,28 @@ test("serializes hero with buttons as markdown links", () => {
   expect(md).toContain("- Broken");
 });
 
-test("serializes feature cards as nested headings", () => {
+test("serializes project showcase as nested headings and links", () => {
   const md = pageBuilderToMarkdown([
     {
-      _type: "featureCardsIcon",
-      title: "Features",
-      cards: [
+      _type: "projectShowcase",
+      title: "Selected Projects",
+      items: [
         {
-          _key: "c1",
-          title: "Fast",
-          richText: para("Very fast."),
-          icon: "bolt",
+          _key: "p1",
+          title: "Blog Engine",
+          description: "Fast writing tool.",
+          category: "Tool",
+          year: "2026",
+          liveUrl: "https://engine.dev",
         },
       ],
     },
   ]);
 
-  expect(md).toContain("## Features");
-  expect(md).toContain("### Fast");
-  expect(md).toContain("Very fast.");
-  expect(md).not.toContain("bolt");
+  expect(md).toContain("## Selected Projects");
+  expect(md).toContain("### Blog Engine (2026)");
+  expect(md).toContain("Fast writing tool.");
+  expect(md).toContain("[Live Site](https://engine.dev)");
 });
 
 test("serializes subscribe newsletter without form markup", () => {
@@ -111,44 +102,6 @@ test("unknown blocks contribute nothing", () => {
   expect(md).not.toContain("Ignore me");
   expect(md).toContain("## Kept");
   expect(md).toContain("Body.");
-});
-
-test("treats '#' href as no link (plain text fallback)", () => {
-  const faq = pageBuilderToMarkdown([
-    {
-      _type: "faqAccordion",
-      title: "Q",
-      categories: [
-        {
-          _key: "cat-1",
-          title: "General",
-          faqs: [{ _id: "1", title: "x", richText: para("y") }],
-        },
-      ],
-      link: { title: "More", href: "#" },
-    },
-  ]);
-  expect(faq).toContain("More");
-  expect(faq).not.toContain("(#)");
-});
-
-test("keeps no-href links as plain text instead of dropping them", () => {
-  const faq = pageBuilderToMarkdown([
-    {
-      _type: "faqAccordion",
-      title: "Q",
-      categories: [
-        {
-          _key: "cat-1",
-          title: "General",
-          faqs: [{ _id: "1", title: "x", richText: para("y") }],
-        },
-      ],
-      link: { title: "All questions" },
-    },
-  ]);
-  expect(faq).toContain("All questions");
-  expect(faq).not.toContain("](");
 });
 
 test("separates blocks with a blank line", () => {

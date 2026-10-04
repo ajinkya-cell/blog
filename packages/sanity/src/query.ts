@@ -1,14 +1,13 @@
+import { calloutQuoteGroqProjection } from "@workspace/sanity-blocks/callout-quote/callout-quote.groq";
 import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
-import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
-import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
+import { featuredWritingGroqProjection } from "@workspace/sanity-blocks/featured-writing/featured-writing.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
-import { heroSplitGroqProjection } from "@workspace/sanity-blocks/hero-split/hero-split.groq";
-import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
+import { personalHeroGroqProjection } from "@workspace/sanity-blocks/personal-hero/personal-hero.groq";
+import { projectShowcaseGroqProjection } from "@workspace/sanity-blocks/project-showcase/project-showcase.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
 import { showcaseGridGroqProjection } from "@workspace/sanity-blocks/showcase-grid/showcase-grid.groq";
 import { socialGridGroqProjection } from "@workspace/sanity-blocks/social-grid/social-grid.groq";
 import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
-import { videoFeatureGroqProjection } from "@workspace/sanity-blocks/video-feature/video-feature.groq";
 import { defineQuery } from "next-sanity";
 
 const imageFields = /* groq */ `
@@ -91,6 +90,11 @@ const blogAuthorFragment = /* groq */ `
     _id,
     name,
     position,
+    tagline,
+    location,
+    status,
+    bio,
+    socialLinks,
     ${imageFragment}
   }
 `;
@@ -103,6 +107,8 @@ const blogCardFragment = /* groq */ `
   "slug":slug.current,
   orderRank,
   category,
+  tags,
+  readTime,
   ${imageFragment},
   publishedAt,
   ${blogAuthorFragment}
@@ -130,17 +136,16 @@ const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
     _type,
+    ${personalHeroGroqProjection},
+    ${featuredWritingGroqProjection},
+    ${projectShowcaseGroqProjection},
+    ${calloutQuoteGroqProjection},
     ${ctaGroqProjection},
     ${heroGroqProjection},
-    ${heroSplitGroqProjection},
-    ${faqAccordionGroqProjection},
-    ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},
-    ${logoCloudGroqProjection},
     ${socialGridGroqProjection},
     ${showcaseGridGroqProjection},
-    ${richTextBlockGroqProjection},
-    ${videoFeatureGroqProjection}
+    ${richTextBlockGroqProjection}
   }
 `;
 
@@ -220,6 +225,9 @@ export const queryBlogSlugPageData = defineQuery(`
     "slug": slug.current,
     ogTitle,
     "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
+    orderRank,
+    tags,
+    readTime,
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -338,6 +346,8 @@ export const queryGlobalSeoSettings = defineQuery(`
     "ogImage": ogImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     siteDescription,
     socialLinks{
+      github,
+      bluesky,
       linkedin,
       facebook,
       twitter,
@@ -354,6 +364,8 @@ export const querySettingsData = defineQuery(`
     _type,
     siteTitle,
     siteDescription,
+    authorBio,
+    colophon,
     "logo": logos.logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
     "socialLinks": socialLinks,
     "contactEmail": contactEmail,
@@ -367,3 +379,60 @@ export const queryRedirects = defineQuery(`
     "permanent" : permanent == "true"
   }
 `);
+
+export const queryAllProjects = defineQuery(`
+  *[_type == "project" && defined(slug.current)] | order(orderRank asc){
+    _id,
+    _type,
+    title,
+    description,
+    "slug": slug.current,
+    year,
+    status,
+    category,
+    techStack,
+    githubUrl,
+    liveUrl,
+    featured,
+    ${imageFragment}
+  }
+`);
+
+export const queryRssFeedData = defineQuery(`
+  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(publishedAt desc, _createdAt desc) {
+    _id,
+    title,
+    description,
+    "slug": slug.current,
+    publishedAt,
+    _createdAt,
+    _updatedAt,
+    category,
+    tags,
+    ${blogAuthorFragment}
+  }
+`);
+
+export const queryAllBlogSlugsAndTitles = defineQuery(`
+  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc) {
+    _id,
+    title,
+    "slug": slug.current
+  }
+`);
+
+export const queryAuthorProfile = defineQuery(`
+  *[_type == "author"][0]{
+    _id,
+    name,
+    position,
+    tagline,
+    location,
+    status,
+    bio,
+    socialLinks,
+    ${imageFragment}
+  }
+`);
+
+

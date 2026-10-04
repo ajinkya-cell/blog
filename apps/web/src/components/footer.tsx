@@ -10,6 +10,7 @@ import type {
 } from "@workspace/sanity/types";
 import {
   FacebookIcon,
+  GithubIcon,
   InstagramBrandIcon,
   LinkedinBrandIcon,
   RedditBrandIcon,
@@ -60,34 +61,40 @@ function SocialLinks({ data }: Readonly<SocialLinksProps>) {
     return null;
   }
 
-  const { facebook, twitter, instagram, youtube, linkedin, reddit } = data;
+  const { facebook, twitter, instagram, youtube, linkedin, reddit, github } =
+    data;
 
   const socialLinks = [
     {
-      url: instagram,
-      Icon: InstagramBrandIcon,
-      label: "Follow us on Instagram",
+      url: github,
+      Icon: GithubIcon,
+      label: "Follow on GitHub",
     },
-    {
-      url: facebook,
-      Icon: FacebookIcon,
-      label: "Follow us on Facebook",
-    },
-    { url: twitter, Icon: XBrandIcon, label: "Follow us on Twitter" },
+    { url: twitter, Icon: XBrandIcon, label: "Follow on Twitter/X" },
     {
       url: linkedin,
       Icon: LinkedinBrandIcon,
-      label: "Follow us on LinkedIn",
+      label: "Connect on LinkedIn",
+    },
+    {
+      url: instagram,
+      Icon: InstagramBrandIcon,
+      label: "Follow on Instagram",
     },
     {
       url: youtube,
       Icon: YoutubeIcon,
-      label: "Subscribe to our YouTube channel",
+      label: "Subscribe on YouTube",
     },
     {
       url: reddit,
       Icon: RedditBrandIcon,
-      label: "Join us on Reddit",
+      label: "Join on Reddit",
+    },
+    {
+      url: facebook,
+      Icon: FacebookIcon,
+      label: "Follow on Facebook",
     },
   ].filter((link) => link.url);
 
@@ -120,7 +127,7 @@ function SystemsOperationalPill() {
         className="size-2 shrink-0 rounded-full bg-accent-green"
       />
       <span className="font-mono text-accent-green text-xs uppercase leading-5 tracking-[0.3px]">
-        All systems operational
+        Writing & Building
       </span>
     </div>
   );
@@ -129,31 +136,27 @@ function SystemsOperationalPill() {
 function FooterTopBar() {
   return (
     <div className="w-full shrink-0 bg-background [background-image:radial-gradient(circle,var(--color-zinc-500)_0.8px,transparent_1.3px)] [background-position:top] [background-repeat:repeat-x] [background-size:6.7px_1.4px]">
-      <div className="container flex items-center justify-center py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+      <div className="container flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="size-2 shrink-0 rounded-[1px] bg-accent-green"
+            className="size-2 shrink-0 rounded-full bg-accent-green"
           />
-          <p className="whitespace-nowrap font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
-            <span>Engine: </span>
-            <span className="text-muted-foreground dark:text-accent-green">
-              Turbo Start
-            </span>
-            <span className="bg-linear-to-r from-transparent to-accent-green bg-clip-text text-transparent">
-              {" ///"}
-            </span>
+          <p className="whitespace-nowrap font-mono text-muted-foreground text-xs uppercase tracking-wider">
+            <span>Independent Writing & Code</span>
           </p>
         </div>
-        <div className="hidden items-center justify-center md:flex">
-          <p className="whitespace-nowrap font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
-            [ Nitro: Armed ]
-          </p>
-        </div>
-        <div className="hidden items-center justify-end sm:flex">
-          <p className="whitespace-nowrap font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
-            [ Ready to Rip ]
-          </p>
+        <div className="flex items-center gap-4 font-mono text-xs">
+          <Link
+            className="text-muted-foreground transition-colors hover:text-foreground hover:underline"
+            href="/feed.xml"
+            target="_blank"
+          >
+            [ RSS Feed ]
+          </Link>
+          <span className="hidden text-muted-foreground/60 sm:inline">
+            [ Built with Next.js & Sanity ]
+          </span>
         </div>
       </div>
     </div>

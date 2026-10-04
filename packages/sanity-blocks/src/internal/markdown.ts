@@ -63,6 +63,14 @@ export interface MarkdownShowcaseItem {
   siteName?: string | null;
   url?: string | null;
   category?: string | null;
+  title?: string | null;
+  description?: string | null;
+  year?: string | null;
+  status?: string | null;
+  techStack?: string[] | null;
+  githubUrl?: string | null;
+  liveUrl?: string | null;
+  featured?: boolean | null;
 }
 
 export interface MarkdownFaqCategory {
@@ -118,6 +126,22 @@ export interface MarkdownBlock {
   socials?: MarkdownSocial[] | null;
   video?: MarkdownVideo | null;
   testimonial?: MarkdownTestimonial | null;
+  // Personal blog block fields:
+  greeting?: string | null;
+  statusPill?: string | null;
+  tagline?: string | null;
+  bio?: PortableTextValue;
+  quote?: string | null;
+  author?: string | null;
+  source?: string | null;
+  posts?: Array<{
+    title?: string | null;
+    slug?: string | null;
+    description?: string | null;
+    publishedAt?: string | null;
+    category?: string | null;
+    readTime?: number | null;
+  }> | null;
 }
 
 /** Joins defined, non-empty sections with a blank line between them. */

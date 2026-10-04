@@ -29,12 +29,69 @@ export const author = defineType({
         "A photo of the author that will appear next to their articles",
     }),
     defineField({
+      name: "tagline",
+      type: "string",
+      title: "Tagline",
+      description: "A short one-line statement (e.g. 'Software engineer & writer')",
+    }),
+    defineField({
+      name: "location",
+      type: "string",
+      title: "Location",
+      description: "Where you are based (e.g. 'San Francisco, CA')",
+    }),
+    defineField({
+      name: "status",
+      type: "string",
+      title: "Status / Currently",
+      description: "Current focus (e.g. 'Building open web experiences')",
+    }),
+    defineField({
       name: "bio",
       type: "text",
       title: "Bio",
       description:
         "A short paragraph about the author's background and expertise",
       rows: 3,
+    }),
+    defineField({
+      name: "socialLinks",
+      type: "object",
+      title: "Social Links",
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({
+          name: "github",
+          type: "url",
+          title: "GitHub Profile URL",
+        }),
+        defineField({
+          name: "twitter",
+          type: "url",
+          title: "Twitter / X Profile URL",
+        }),
+        defineField({
+          name: "bluesky",
+          type: "url",
+          title: "Bluesky Profile URL",
+        }),
+        defineField({
+          name: "linkedin",
+          type: "url",
+          title: "LinkedIn Profile URL",
+        }),
+        defineField({
+          name: "website",
+          type: "url",
+          title: "Personal Website URL",
+        }),
+        defineField({
+          name: "email",
+          type: "string",
+          title: "Email Address",
+          validation: (rule) => rule.email(),
+        }),
+      ],
     }),
   ],
   preview: {

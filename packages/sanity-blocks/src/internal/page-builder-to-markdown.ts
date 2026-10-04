@@ -1,18 +1,17 @@
 /** Thin dispatcher: each block's Markdown serializer is co-located in its block
  * directory (add a `case` + `markdown.ts` for new blocks). Unknown types return "". */
 
+import { calloutQuoteToMarkdown } from "../callout-quote/markdown";
 import { ctaToMarkdown } from "../cta/markdown";
-import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
-import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
+import { featuredWritingToMarkdown } from "../featured-writing/markdown";
 import { heroToMarkdown } from "../hero/markdown";
-import { heroSplitToMarkdown } from "../hero-split/markdown";
-import { logoCloudToMarkdown } from "../logo-cloud/markdown";
+import type { MarkdownBlock, MarkdownOptions } from "../internal/markdown";
+import { personalHeroToMarkdown } from "../personal-hero/markdown";
+import { projectShowcaseToMarkdown } from "../project-showcase/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
 import { socialGridToMarkdown } from "../social-grid/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
-import { videoFeatureToMarkdown } from "../video-feature/markdown";
-import type { MarkdownBlock, MarkdownOptions } from "./markdown";
 
 export { imageToMarkdown } from "./markdown";
 export type { MarkdownBlock };
@@ -22,28 +21,26 @@ function blockToMarkdown(
   options: MarkdownOptions
 ): string {
   switch (block?._type) {
+    case "personalHero":
+      return personalHeroToMarkdown(block, options);
+    case "featuredWriting":
+      return featuredWritingToMarkdown(block, options);
+    case "projectShowcase":
+      return projectShowcaseToMarkdown(block, options);
+    case "calloutQuote":
+      return calloutQuoteToMarkdown(block, options);
     case "hero":
       return heroToMarkdown(block, options);
-    case "heroSplit":
-      return heroSplitToMarkdown(block, options);
     case "cta":
       return ctaToMarkdown(block, options);
     case "richTextBlock":
       return richTextBlockToMarkdown(block, options);
-    case "featureCardsIcon":
-      return featureCardsIconToMarkdown(block, options);
-    case "logoCloud":
-      return logoCloudToMarkdown(block, options);
     case "socialGrid":
       return socialGridToMarkdown(block, options);
     case "showcaseGrid":
       return showcaseGridToMarkdown(block, options);
-    case "faqAccordion":
-      return faqAccordionToMarkdown(block, options);
     case "subscribeNewsletter":
       return subscribeNewsletterToMarkdown(block, options);
-    case "videoFeature":
-      return videoFeatureToMarkdown(block, options);
     default:
       return "";
   }

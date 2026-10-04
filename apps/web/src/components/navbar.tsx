@@ -14,7 +14,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { GithubStars } from "@/components/github-stars";
 import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/mobile-menu";
 import type { ColumnLink, NavigationData } from "@/types";
@@ -200,9 +199,8 @@ function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
 export function Navbar({
   navbarData,
   settingsData,
-  stars,
-}: Readonly<NavigationData & { stars?: number | null }>) {
-  const { columns, buttons, gitHubUrl } = navbarData || {};
+}: Readonly<NavigationData>) {
+  const { columns, buttons } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
   const headerRef = useRef<HTMLElement>(null);
   useNavContrast(headerRef);
@@ -223,7 +221,7 @@ export function Navbar({
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
             <Logo
-              alt={siteTitle ?? "Turbo Start Sanity"}
+              alt={siteTitle ?? "Blog"}
               className="h-5 w-auto object-left"
               image={logos?.logo}
               imageDark={logos?.logoDark}
@@ -299,7 +297,6 @@ export function Navbar({
             className="group hidden flex-1 items-center justify-end gap-2 lg:flex"
             data-nav-adaptive=""
           >
-            <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <SanityButtons
               buttonClassName={NAV_BUTTON_CLASS}
               buttons={buttons || []}
@@ -309,11 +306,6 @@ export function Navbar({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <GithubStars
-              className="-mr-2"
-              gitHubUrl={gitHubUrl}
-              stars={stars}
-            />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
         </div>

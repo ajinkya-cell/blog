@@ -45,6 +45,40 @@ export function formatDate(value?: string | null): string | null {
   });
 }
 
+function extractPlainText(content: unknown): string {
+  if (typeof content === "string") {
+    return content;
+  }
+  if (!Array.isArray(content)) {
+    return "";
+  }
+  const chunks: string[] = [];
+  for (const block of content) {
+    const children = block?.children;
+    if (Array.isArray(children)) {
+      for (const span of children) {
+        if (typeof span?.text === "string") {
+          chunks.push(span.text);
+        }
+      }
+    }
+  }
+  return chunks.join(" ");
+}
+
+/**
+ * Calculates estimated reading time in minutes from a string or PortableText blocks.
+ * Uses an average reading speed of 225 words per minute.
+ */
+export function estimateReadingTime(content: unknown): number {
+  if (!content) {
+    return 1;
+  }
+  const text = extractPlainText(content).trim();
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  return Math.max(1, Math.ceil(words / 225));
+}
+
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(

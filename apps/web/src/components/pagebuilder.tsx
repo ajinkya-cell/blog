@@ -2,17 +2,16 @@
 
 import { useOptimistic } from "@sanity/visual-editing/react";
 import { env } from "@workspace/env/client";
+import { CalloutQuote } from "@workspace/sanity-blocks/callout-quote/index";
 import { CTABlock } from "@workspace/sanity-blocks/cta/index";
-import { FaqAccordion } from "@workspace/sanity-blocks/faq-accordion/index";
-import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-icon/index";
+import { FeaturedWriting } from "@workspace/sanity-blocks/featured-writing/index";
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
-import { HeroSplit } from "@workspace/sanity-blocks/hero-split/index";
-import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
+import { PersonalHero } from "@workspace/sanity-blocks/personal-hero/index";
+import { ProjectShowcase } from "@workspace/sanity-blocks/project-showcase/index";
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { ShowcaseGrid } from "@workspace/sanity-blocks/showcase-grid/index";
 import { SocialGrid } from "@workspace/sanity-blocks/social-grid/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
-import { VideoFeature } from "@workspace/sanity-blocks/video-feature/index";
 import { cn } from "@workspace/tailwind-config/utils";
 import { createDataAttribute } from "next-sanity";
 
@@ -41,10 +40,36 @@ function renderBlockComponent(
   dataSanity?: string
 ) {
   switch (block?._type) {
+    case "personalHero":
+      return (
+        <PersonalHero
+          {...(block as PagebuilderType<"personalHero">)}
+          dataSanity={dataSanity}
+        />
+      );
+    case "featuredWriting":
+      return (
+        <FeaturedWriting
+          {...(block as PagebuilderType<"featuredWriting">)}
+          dataSanity={dataSanity}
+        />
+      );
+    case "projectShowcase":
+      return (
+        <ProjectShowcase
+          {...(block as PagebuilderType<"projectShowcase">)}
+          dataSanity={dataSanity}
+        />
+      );
+    case "calloutQuote":
+      return (
+        <CalloutQuote
+          {...(block as PagebuilderType<"calloutQuote">)}
+          dataSanity={dataSanity}
+        />
+      );
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
-    case "faqAccordion":
-      return <FaqAccordion {...(block as PagebuilderType<"faqAccordion">)} />;
     case "hero":
       return (
         <HeroBlock
@@ -53,35 +78,18 @@ function renderBlockComponent(
           isFirst={isFirst}
         />
       );
-    case "heroSplit":
-      return (
-        <HeroSplit
-          {...(block as PagebuilderType<"heroSplit">)}
-          isFirst={isFirst}
-        />
-      );
-    case "featureCardsIcon":
-      return (
-        <FeatureCardsWithIcon
-          {...(block as PagebuilderType<"featureCardsIcon">)}
-        />
-      );
     case "subscribeNewsletter":
       return (
         <SubscribeNewsletter
           {...(block as PagebuilderType<"subscribeNewsletter">)}
         />
       );
-    case "logoCloud":
-      return <LogoCloud {...(block as PagebuilderType<"logoCloud">)} />;
     case "socialGrid":
       return <SocialGrid {...(block as PagebuilderType<"socialGrid">)} />;
     case "showcaseGrid":
       return <ShowcaseGrid {...(block as PagebuilderType<"showcaseGrid">)} />;
     case "richTextBlock":
       return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
-    case "videoFeature":
-      return <VideoFeature {...(block as PagebuilderType<"videoFeature">)} />;
     default:
       return null;
   }

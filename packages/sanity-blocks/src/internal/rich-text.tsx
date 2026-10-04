@@ -159,6 +159,34 @@ const components: Partial<PortableTextReactComponents> = {
         rows={value?.rows}
       />
     ),
+    callout: ({ value }) => {
+      if (!value?.content) {
+        return null;
+      }
+      const type = value.type ?? "info";
+      return (
+        <aside
+          className={cn(
+            "my-6 not-prose rounded-r border-l-4 p-4 text-sm leading-relaxed",
+            type === "warning" &&
+              "border-amber-500 bg-amber-500/10 text-amber-950 dark:text-amber-100",
+            type === "tip" &&
+              "border-emerald-500 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100",
+            type === "quote" &&
+              "border-purple-500 bg-purple-500/10 italic text-purple-950 dark:text-purple-100",
+            type === "info" &&
+              "border-blue-500 bg-blue-500/10 text-blue-950 dark:text-blue-100"
+          )}
+        >
+          {value.title ? (
+            <div className="mb-1 font-mono font-semibold text-xs tracking-wider uppercase">
+              {value.title}
+            </div>
+          ) : null}
+          <p className="m-0 whitespace-pre-line">{value.content}</p>
+        </aside>
+      );
+    },
   },
   hardBreak: () => <br />,
 };

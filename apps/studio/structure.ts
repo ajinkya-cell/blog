@@ -4,9 +4,9 @@ import {
   Cog,
   File,
   FileText,
+  FolderGit2,
   House,
   type LucideIcon,
-  MessageCircle,
   PanelBottom,
   PanelTop,
   Settings2,
@@ -112,11 +112,12 @@ export const structure = (
         list: { type: "blog", title: "Blogs", icon: FileText },
         context,
       }),
-      createList({
+      orderableDocumentListDeskItem({
+        type: "project",
         S,
-        type: "faq",
-        title: "FAQs",
-        icon: MessageCircle,
+        context,
+        icon: FolderGit2,
+        title: "Projects",
       }),
       createList({ S, type: "author", title: "Authors", icon: User }),
       createList({

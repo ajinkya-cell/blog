@@ -10,6 +10,18 @@ const socialLinks = defineField({
   description: "Add links to your social media profiles",
   fields: [
     defineField({
+      name: "github",
+      type: "string",
+      title: "GitHub URL",
+      description: "Full URL to your GitHub profile",
+    }),
+    defineField({
+      name: "bluesky",
+      type: "string",
+      title: "Bluesky URL",
+      description: "Full URL to your Bluesky profile",
+    }),
+    defineField({
       name: "linkedin",
       type: "string",
       title: "LinkedIn URL",
@@ -189,6 +201,20 @@ export const settings = defineType({
       title: "Contact Email",
       description: "Primary contact email address for your website",
       validation: (rule) => rule.email(),
+    }),
+    defineField({
+      name: "authorBio",
+      type: "text",
+      title: "Site Author Bio (Short)",
+      description: "Short bio displayed in the footer or default site author prompts",
+      rows: 2,
+    }),
+    defineField({
+      name: "colophon",
+      type: "text",
+      title: "Colophon / Footer Note",
+      description: "Personal note or technical stack colophon rendered in the footer",
+      rows: 2,
     }),
     socialLinks,
   ],

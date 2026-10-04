@@ -113,6 +113,27 @@ export const blog = defineType({
         layout: "dropdown",
       },
     }),
+    defineField({
+      name: "readTime",
+      type: "number",
+      title: "Reading Time (Minutes)",
+      description:
+        "Estimated reading time in minutes. If omitted, it will be automatically calculated from word count.",
+      group: GROUP.MAIN_CONTENT,
+      validation: (rule) => rule.min(1).max(120),
+    }),
+    defineField({
+      name: "tags",
+      type: "array",
+      title: "Tags",
+      description:
+        "Keywords or topics for indexing and filtering (e.g. 'architecture', 'nextjs', 'reflection')",
+      of: [defineArrayMember({ type: "string" })],
+      options: {
+        layout: "tags",
+      },
+      group: GROUP.MAIN_CONTENT,
+    }),
     imageWithAltField({
       title: "Image",
       description:

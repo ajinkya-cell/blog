@@ -47,4 +47,22 @@ export const locations = {
       ],
     }),
   }),
+  project: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || "Projects",
+          href: "/projects",
+        },
+        {
+          title: "Home",
+          href: "/",
+        },
+      ],
+    }),
+  }),
 };

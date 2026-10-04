@@ -109,28 +109,63 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
 function BlogMeta({
   publishedAt,
   category,
+  readTime,
+  tags,
 }: Readonly<{
   publishedAt: string | null;
   category?: string | null;
+  readTime?: number | null;
+  tags?: string[] | null;
 }>) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <BlogDate publishedAt={publishedAt} />
+      {readTime ? (
+        <span className="text-muted-foreground text-sm">
+          · {readTime} min read
+        </span>
+      ) : null}
       <BlogCategoryTag category={category} />
+      {tags && tags.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {tags.slice(0, 3).map((tag) => (
+            <span
+              className="rounded-none bg-muted px-1.5 py-0.5 font-mono text-muted-foreground text-xs"
+              key={tag}
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
-  const { title, publishedAt, slug, description, image, authors, category } =
-    blog ?? {};
+  const {
+    title,
+    publishedAt,
+    slug,
+    description,
+    image,
+    authors,
+    category,
+    readTime,
+    tags,
+  } = blog ?? {};
 
   return (
     <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
         <BlockEyebrow eyebrow="Featured" />
         <div className="grid gap-4">
-          <BlogMeta category={category} publishedAt={publishedAt} />
+          <BlogMeta
+            category={category}
+            publishedAt={publishedAt}
+            readTime={readTime}
+            tags={tags}
+          />
           <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
             <Link className="outline-none" href={slug ?? "#"}>
               <span className="absolute inset-0 z-10" />
@@ -155,11 +190,16 @@ export function BlogCard({ blog }: BlogCardProps) {
     return null;
   }
 
-  const { title, publishedAt, slug, description, authors, category } = blog;
+  const { title, publishedAt, slug, description, authors, category, readTime, tags } = blog;
 
   return (
     <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
-      <BlogMeta category={category} publishedAt={publishedAt} />
+      <BlogMeta
+        category={category}
+        publishedAt={publishedAt}
+        readTime={readTime}
+        tags={tags}
+      />
       <div className="flex flex-col gap-3">
         <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
           <Link className="outline-none" href={slug ?? "#"}>

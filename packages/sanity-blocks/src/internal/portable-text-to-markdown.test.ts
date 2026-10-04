@@ -448,3 +448,31 @@ test("never emits raw JSX-style tags", () => {
   ]);
   expect(md).not.toMatch(/<[A-Za-z]/);
 });
+
+test("serializes callout blocks with title and content", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "callout",
+      title: "Note",
+      type: "info",
+      content: "This is an important note.\nSecond line.",
+    },
+  ]);
+  expect(md).toBe("> **Note**\n> This is an important note.\n> Second line.");
+});
+
+test("serializes callout blocks without title", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "callout",
+      type: "quote",
+      content: "A wise quote.",
+    },
+  ]);
+  expect(md).toBe("> A wise quote.");
+});
+
+test("empty callout block serializes to nothing", () => {
+  expect(portableTextToMarkdown([{ _type: "callout", content: "  " }])).toBe("");
+});
+

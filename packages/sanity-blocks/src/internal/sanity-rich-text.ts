@@ -2,6 +2,7 @@ import { CodeBlockIcon } from "@sanity/icons/CodeBlock";
 import { ImageIcon } from "@sanity/icons/Image";
 import { LinkIcon } from "@sanity/icons/Link";
 import { ThLargeIcon } from "@sanity/icons/ThLarge";
+import { Info } from "lucide-react";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -14,6 +15,7 @@ const PORTABLE_TEXT_MEMBER_NAMES = {
   image: "image",
   code: "code",
   table: "table",
+  callout: "callout",
 } as const;
 
 const CODE_LANGUAGES = [
@@ -213,6 +215,65 @@ const richTextMembers = [
             rowCount && columnCount
               ? `${rowCount}×${columnCount} Table`
               : "Table",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.callout,
+    type: "object",
+    title: "Callout",
+    description: "An highlighted callout note, tip, warning, or quote",
+    icon: Info,
+    fields: [
+      defineField({
+        name: "type",
+        type: "string",
+        title: "Callout Type",
+        options: {
+          list: [
+            { title: "Note / Info", value: "info" },
+            { title: "Tip / Idea", value: "tip" },
+            { title: "Warning / Caution", value: "warning" },
+            { title: "Quote", value: "quote" },
+          ],
+          layout: "radio",
+        },
+        initialValue: "info",
+      }),
+      defineField({
+        name: "title",
+        type: "string",
+        title: "Title (Optional)",
+        description: "Optional custom header for the callout",
+      }),
+      defineField({
+        name: "content",
+        type: "text",
+        title: "Content",
+        description: "The message or text of the callout",
+        rows: 4,
+        validation: (rule) => rule.required(),
+      }),
+    ],
+    preview: {
+      select: {
+        title: "title",
+        type: "type",
+        content: "content",
+      },
+      prepare({ title, type, content }) {
+        const typeEmoji =
+          type === "warning"
+            ? "⚠️"
+            : type === "tip"
+              ? "💡"
+              : type === "quote"
+                ? "💬"
+                : "ℹ️";
+        return {
+          title: title || (content ? content.slice(0, 40) : "Callout"),
+          subtitle: `${typeEmoji} ${type || "info"}`,
         };
       },
     },

@@ -40,6 +40,10 @@ export interface PortableTextNode {
   // Table fields.
   headerRows?: number | null;
   rows?: PortableTextTableRow[] | null;
+  // Callout fields.
+  title?: string | null;
+  type?: string | null;
+  content?: string | null;
 }
 
 export interface PortableTextTableRow {
@@ -229,6 +233,23 @@ export function portableTextToMarkdown(
 
         // No resolvable URL — keep textual content instead of broken markup.
         return caption || alt;
+      },
+      callout: ({ value }) => {
+        const node = value as {
+          title?: string | null;
+          type?: string | null;
+          content?: string | null;
+        };
+        const content = (node.content ?? "").trim();
+        if (!content) {
+          return "";
+        }
+        const lines: string[] = [];
+        if (node.title?.trim()) {
+          lines.push(`**${node.title.trim()}**`);
+        }
+        lines.push(...content.split("\n"));
+        return lines.map((line) => (line ? `> ${line}` : ">")).join("\n");
       },
     },
     // Suppress unknown block types; the default emits a JSON code block.

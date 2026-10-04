@@ -20,7 +20,6 @@ import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { StickyFooter } from "@/components/sticky-footer";
 import { VisualEditingLayer } from "@/components/visual-editing-layer";
-import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
 
 const fontSans = Geist({
@@ -137,9 +136,8 @@ async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
     perspective,
     stega,
   });
-  const stars = await getGithubStars(navbarData?.gitHubUrl);
 
   return (
-    <Navbar navbarData={navbarData} settingsData={settingsData} stars={stars} />
+    <Navbar navbarData={navbarData} settingsData={settingsData} />
   );
 }
