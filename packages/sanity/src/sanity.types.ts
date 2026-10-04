@@ -1561,13 +1561,7 @@ export type QueryHomePageDataResult = {
           slug: string | null;
           publishedAt: string | null;
           category:
-            | "aeo"
-            | "changelog"
-            | "nextjs"
-            | "sanity"
-            | "seo"
-            | "skills"
-            | null;
+            "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
           readTime: number | null;
           image: {
             id: string | null;
@@ -2200,13 +2194,7 @@ export type QuerySlugPageDataResult = {
           slug: string | null;
           publishedAt: string | null;
           category:
-            | "aeo"
-            | "changelog"
-            | "nextjs"
-            | "sanity"
-            | "seo"
-            | "skills"
-            | null;
+            "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
           readTime: number | null;
           image: {
             id: string | null;
@@ -2837,13 +2825,7 @@ export type QueryBlogIndexPageResult = {
           slug: string | null;
           publishedAt: string | null;
           category:
-            | "aeo"
-            | "changelog"
-            | "nextjs"
-            | "sanity"
-            | "seo"
-            | "skills"
-            | null;
+            "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
           readTime: number | null;
           image: {
             id: string | null;
@@ -3374,13 +3356,7 @@ export type QueryBlogIndexPageResult = {
         slug: string | null;
         orderRank: string | null;
         category:
-          | "aeo"
-          | "changelog"
-          | "nextjs"
-          | "sanity"
-          | "seo"
-          | "skills"
-          | null;
+          "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
         tags: Array<string> | null;
         readTime: number | null;
         image: {
@@ -3441,13 +3417,7 @@ export type QueryBlogIndexPageResult = {
     slug: string | null;
     orderRank: string | null;
     category:
-      | "aeo"
-      | "changelog"
-      | "nextjs"
-      | "sanity"
-      | "seo"
-      | "skills"
-      | null;
+      "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
     tags: Array<string> | null;
     readTime: number | null;
     image: {

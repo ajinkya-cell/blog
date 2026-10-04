@@ -19,15 +19,15 @@ async function getNowData() {
     perspective: "published",
     stega: false,
   });
-  return { author };
-}
-
-export default async function NowPage() {
-  const { author } = await getNowData();
   const currentDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
+  return { author, currentDate };
+}
+
+export default async function NowPage() {
+  const { author, currentDate } = await getNowData();
 
   return (
     <main className="bg-background">

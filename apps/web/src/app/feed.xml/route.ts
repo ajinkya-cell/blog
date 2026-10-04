@@ -2,10 +2,8 @@ import { sanityFetch } from "@workspace/sanity/live";
 import { queryRssFeedData, querySettingsData } from "@workspace/sanity/query";
 import { getBaseUrl } from "@/utils";
 
-export const dynamic = "force-static";
-export const revalidate = 3600;
-
-export async function GET() {
+async function generateRssFeedXml() {
+  "use cache";
   const baseUrl = getBaseUrl();
 
   const [{ data: posts }, { data: settings }] = await Promise.all([
@@ -45,7 +43,7 @@ export async function GET() {
     })
     .join("\n");
 
-  const rssFeed = `<?xml version="1.0" encoding="UTF-8"?>
+  return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title><![CDATA[${siteTitle}]]></title>
@@ -57,6 +55,10 @@ export async function GET() {
 ${itemsXml}
   </channel>
 </rss>`;
+}
+
+export async function GET() {
+  const rssFeed = await generateRssFeedXml();
 
   return new Response(rssFeed, {
     headers: {
