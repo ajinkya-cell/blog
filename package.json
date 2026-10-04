@@ -1,0 +1,53 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14",
+    "@workspace/typescript-config": "workspace:*",
+    "turbo": "^2.11.3",
+    "typescript": "catalog:"
+  },
+  "author": "Roboto Studio (https://robotostudio.com)",
+  "description": "Open-source Sanity + Next.js starter: a pnpm/Turborepo monorepo with a Next.js 16 frontend, a Sanity Studio 6 workspace, a shared page-builder block library, and Visual Editing wired end to end.",
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robotostudio/turbo-start-sanity.git"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "build:studio": "turbo run build --filter=studio",
+    "build:web": "turbo run build --filter=web",
+    "dev": "turbo run dev",
+    "dev:studio": "turbo run dev --filter=studio",
+    "dev:web": "turbo run dev --filter=web",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "check-types": "turbo run check-types",
+    "type": "turbo run type",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e"
+  },
+  "keywords": [
+    "sanity",
+    "sanity-template",
+    "nextjs",
+    "turborepo",
+    "monorepo",
+    "page-builder",
+    "visual-editing",
+    "cms",
+    "tailwindcss",
+    "typescript"
+  ],
+  "homepage": "https://github.com/robotostudio/turbo-start-sanity#readme",
+  "bugs": {
+    "url": "https://github.com/robotostudio/turbo-start-sanity/issues"
+  },
+  "packageManager": "pnpm@11.24.0"
+}
