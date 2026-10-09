@@ -7,7 +7,8 @@ test("calloutQuoteToMarkdown returns empty string for empty block", () => {
 test("calloutQuoteToMarkdown renders blockquote with citation", () => {
   const result = calloutQuoteToMarkdown(
     {
-      quote: "Simple things should be simple, complex things should be possible.",
+      quote:
+        "Simple things should be simple, complex things should be possible.",
       author: "Alan Kay",
     },
     {}

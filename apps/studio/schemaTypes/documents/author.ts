@@ -6,7 +6,9 @@ import { imageWithAltField } from "@/schemaTypes/common";
 export const author = defineType({
   name: "author",
   type: "document",
-  title: "Author",
+  title: "Author Profile",
+  description:
+    "Personal author profile, bio, avatar, and social links for the site author",
   icon: User,
   fields: [
     defineField({
@@ -32,7 +34,8 @@ export const author = defineType({
       name: "tagline",
       type: "string",
       title: "Tagline",
-      description: "A short one-line statement (e.g. 'Software engineer & writer')",
+      description:
+        "A short one-line statement (e.g. 'Software engineer & writer')",
     }),
     defineField({
       name: "location",

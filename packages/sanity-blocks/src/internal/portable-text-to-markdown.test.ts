@@ -473,6 +473,141 @@ test("serializes callout blocks without title", () => {
 });
 
 test("empty callout block serializes to nothing", () => {
-  expect(portableTextToMarkdown([{ _type: "callout", content: "  " }])).toBe("");
+  expect(portableTextToMarkdown([{ _type: "callout", content: "  " }])).toBe(
+    ""
+  );
 });
 
+test("serializes divider block", () => {
+  expect(portableTextToMarkdown([{ _type: "divider", style: "line" }])).toBe(
+    "---"
+  );
+  expect(portableTextToMarkdown([{ _type: "divider", style: "dots" }])).toBe(
+    "---"
+  );
+});
+
+test("serializes pullQuote with and without attribution", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "pullQuote",
+        text: "Simplicity is prerequisite for reliability.",
+      },
+    ])
+  ).toBe('> "Simplicity is prerequisite for reliability."');
+
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "pullQuote",
+        text: "Boring code is dependable code.",
+        attribution: "Dan McKinley",
+      },
+    ])
+  ).toBe('> "Boring code is dependable code."\n> — Dan McKinley');
+});
+
+test("serializes videoEmbed and tweetEmbed", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "videoEmbed",
+        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        caption: "Demo Video",
+      },
+    ])
+  ).toBe("[Video: Demo Video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)");
+
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "tweetEmbed",
+        url: "https://x.com/rauchg/status/123456",
+        caption: "Guillermo on Next.js",
+      },
+    ])
+  ).toBe("[Guillermo on Next.js](https://x.com/rauchg/status/123456)");
+});
+
+test("serializes fileDownload block", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "fileDownload",
+        url: "https://cdn.sanity.io/files/project/production/paper.pdf",
+        label: "Research Paper (PDF)",
+        description: "Official whitepaper release",
+      },
+    ])
+  ).toBe(
+    "[Download: Research Paper (PDF)](https://cdn.sanity.io/files/project/production/paper.pdf)\n\n_Official whitepaper release_"
+  );
+});
+
+test("serializes mathBlock with LaTeX", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "mathBlock",
+        latex: "E = mc^2",
+        caption: "Mass-energy equivalence",
+      },
+    ])
+  ).toBe("$$\nE = mc^2\n$$\n\n_Mass-energy equivalence_");
+});
+
+test("serializes expandable accordion block", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "expandable",
+        summary: "Click to reveal",
+        content: [
+          {
+            _type: "block",
+            style: "normal",
+            children: [{ _type: "span", text: "Secret content." }],
+          },
+        ],
+      },
+    ])
+  ).toBe(
+    "<details>\n<summary>Click to reveal</summary>\n\nSecret content.\n</details>"
+  );
+});
+
+test("serializes codeGroup block with multiple tabs", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "codeGroup",
+        title: "Example Setup",
+        files: [
+          {
+            filename: "package.json",
+            language: "json",
+            code: '{\n  "name": "blog"\n}',
+          },
+          {
+            filename: "index.ts",
+            language: "ts",
+            code: 'console.log("hello");',
+          },
+        ],
+      },
+    ])
+  ).toContain("### Example Setup");
+});
+
+test("serializes playgroundEmbed block", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "playgroundEmbed",
+        title: "Next.js Demo",
+        url: "https://codesandbox.io/s/nextjs-demo",
+      },
+    ])
+  ).toBe("[Playground: Next.js Demo](https://codesandbox.io/s/nextjs-demo)");
+});

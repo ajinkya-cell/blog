@@ -6,7 +6,7 @@ import { BlogCategoryFilter } from "@/components/blog-category-filter";
 import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchLayout } from "@/components/blog-search-layout";
-import { Breadcrumbs } from "@/components/breadcrumbs";
+import { BreadcrumbsJsonLd } from "@/components/breadcrumbs";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
 
@@ -35,8 +35,10 @@ export function BlogPageContent({
 
   return (
     <main className="bg-background">
-      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
-      <div className="container mt-8 mb-16 md:my-16">
+      <BreadcrumbsJsonLd
+        crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
+      />
+      <div className="container mt-8 mb-16 max-w-6xl md:my-16">
         <BlogHeader description={description} title={title} />
 
         <BlogSearchLayout

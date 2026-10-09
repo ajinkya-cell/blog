@@ -62,6 +62,9 @@ export async function generateMetadata({
     params,
     getDynamicFetchOptions(),
   ]);
+  if (!slug || slug[0] === "blog") {
+    notFound();
+  }
   const slugString = `/${slug.join("/")}`;
   const { data: pageData } = await sanityFetchMetadata({
     query: querySlugPageData,
@@ -75,6 +78,11 @@ export async function generateMetadata({
 export default async function SlugPage({
   params,
 }: Readonly<{ params: Promise<SlugParams> }>) {
+  const { slug } = await params;
+  if (!slug || slug[0] === "blog") {
+    notFound();
+  }
+
   const { isEnabled: isDraftMode } = await draftMode();
 
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
@@ -87,7 +95,6 @@ export default async function SlugPage({
 
   // Published render, with a real 404 — not a soft one streamed inside
   // Suspense.
-  const { slug } = await params;
   const pageData = await getPublishedSlugPage(slug);
   if (!pageData) {
     notFound();
@@ -119,6 +126,9 @@ async function SlugPageInner({
     params,
     resolvePageFetchOptions(),
   ]);
+  if (!slug || slug[0] === "blog") {
+    notFound();
+  }
   const pageData = await getDraftSlugPage({ slug, perspective, stega });
   if (!pageData) {
     notFound();

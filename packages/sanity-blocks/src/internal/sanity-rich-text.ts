@@ -2,7 +2,18 @@ import { CodeBlockIcon } from "@sanity/icons/CodeBlock";
 import { ImageIcon } from "@sanity/icons/Image";
 import { LinkIcon } from "@sanity/icons/Link";
 import { ThLargeIcon } from "@sanity/icons/ThLarge";
-import { Info } from "lucide-react";
+import {
+  ChevronDown,
+  Download,
+  Info,
+  Layers,
+  MessageCircle,
+  Minus,
+  Play,
+  Quote,
+  Sigma,
+  Terminal,
+} from "lucide-react";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -16,16 +27,34 @@ const PORTABLE_TEXT_MEMBER_NAMES = {
   code: "code",
   table: "table",
   callout: "callout",
+  divider: "divider",
+  pullQuote: "pullQuote",
+  videoEmbed: "videoEmbed",
+  tweetEmbed: "tweetEmbed",
+  fileDownload: "fileDownload",
+  mathBlock: "mathBlock",
+  expandable: "expandable",
+  codeGroup: "codeGroup",
+  playgroundEmbed: "playgroundEmbed",
 } as const;
 
 const CODE_LANGUAGES = [
   { title: "TypeScript", value: "ts" },
   { title: "TSX", value: "tsx" },
   { title: "JavaScript", value: "js" },
-  { title: "GROQ", value: "groq" },
-  { title: "Bash", value: "bash" },
-  { title: "JSON", value: "json" },
+  { title: "Python", value: "python" },
+  { title: "Rust", value: "rust" },
+  { title: "Go", value: "go" },
+  { title: "SQL", value: "sql" },
+  { title: "HTML", value: "html" },
   { title: "CSS", value: "css" },
+  { title: "JSON", value: "json" },
+  { title: "YAML", value: "yaml" },
+  { title: "Markdown", value: "md" },
+  { title: "Shell / Zsh", value: "zsh" },
+  { title: "Bash", value: "bash" },
+  { title: "Dockerfile", value: "dockerfile" },
+  { title: "GROQ", value: "groq" },
 ];
 
 const PORTABLE_TEXT_BLOCK_STYLES = [
@@ -59,6 +88,9 @@ const PORTABLE_TEXT_MARK_DECORATORS = [
   { title: "Strong", value: "strong" },
   { title: "Emphasis", value: "em" },
   { title: "Code", value: "code" },
+  { title: "Underline", value: "underline" },
+  { title: "Strikethrough", value: "strike-through" },
+  { title: "Highlight", value: "highlight" },
 ];
 
 const PORTABLE_TEXT_MARKS = {
@@ -131,6 +163,13 @@ const richTextMembers = [
         title: "Filename",
         description: "Optional filename shown in the code block header.",
       }),
+      defineField({
+        name: "highlightLines",
+        type: "string",
+        title: "Highlighted Lines (Optional)",
+        description:
+          "Comma-separated line numbers or ranges (e.g. '3,7-10,15').",
+      }),
     ],
     preview: {
       select: {
@@ -151,10 +190,6 @@ const richTextMembers = [
     name: PORTABLE_TEXT_MEMBER_NAMES.table,
     type: "object",
     title: "Table",
-    // The Portable Text table plugin (bundled with `sanity` v6.6+, enabled
-    // in sanity.config.ts) strips fields the schema doesn't declare — omitting
-    // `headerRows` would silently break the header-row toggle, so it's
-    // required here even though the editor UI manages it directly.
     icon: ThLargeIcon,
     fields: [
       defineField({
@@ -223,7 +258,7 @@ const richTextMembers = [
     name: PORTABLE_TEXT_MEMBER_NAMES.callout,
     type: "object",
     title: "Callout",
-    description: "An highlighted callout note, tip, warning, or quote",
+    description: "A highlighted callout note, tip, warning, or quote",
     icon: Info,
     fields: [
       defineField({
@@ -249,20 +284,29 @@ const richTextMembers = [
       }),
       defineField({
         name: "content",
-        type: "text",
+        type: "array",
         title: "Content",
-        description: "The message or text of the callout",
-        rows: 4,
-        validation: (rule) => rule.required(),
+        description:
+          "The message or text of the callout (supports bold, links, code formatting)",
+        of: [
+          defineArrayMember({
+            type: "block",
+            styles: [{ title: "Normal", value: "normal" }],
+            lists: [],
+            marks: {
+              decorators: PORTABLE_TEXT_MARK_DECORATORS,
+              annotations: [customLinkAnnotation],
+            },
+          }),
+        ],
       }),
     ],
     preview: {
       select: {
         title: "title",
         type: "type",
-        content: "content",
       },
-      prepare({ title, type, content }) {
+      prepare({ title, type }) {
         const typeEmoji =
           type === "warning"
             ? "⚠️"
@@ -272,8 +316,398 @@ const richTextMembers = [
                 ? "💬"
                 : "ℹ️";
         return {
-          title: title || (content ? content.slice(0, 40) : "Callout"),
+          title: title || "Callout",
           subtitle: `${typeEmoji} ${type || "info"}`,
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.divider,
+    type: "object",
+    title: "Divider",
+    description: "Horizontal section divider",
+    icon: Minus,
+    fields: [
+      defineField({
+        name: "style",
+        type: "string",
+        title: "Style",
+        description: "Visual style of the divider",
+        options: {
+          list: [
+            { title: "Line (Solid)", value: "line" },
+            { title: "Dots (· · ·)", value: "dots" },
+            { title: "Stars (✦ ✦ ✦)", value: "stars" },
+          ],
+          layout: "radio",
+        },
+        initialValue: "line",
+      }),
+    ],
+    preview: {
+      select: { style: "style" },
+      prepare({ style }) {
+        const labels: Record<string, string> = {
+          line: "────── (Solid Line)",
+          dots: "·  ·  · (Dots)",
+          stars: "✦  ✦  ✦ (Stars)",
+        };
+        return {
+          title: "Divider",
+          subtitle: labels[style ?? "line"] ?? style,
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.pullQuote,
+    type: "object",
+    title: "Pull Quote",
+    description: "A prominent typographic quote with optional attribution",
+    icon: Quote,
+    fields: [
+      defineField({
+        name: "text",
+        type: "text",
+        title: "Quote Text",
+        description: "The quote to highlight in large typography",
+        rows: 3,
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "attribution",
+        type: "string",
+        title: "Attribution (Optional)",
+        description: "Who said this? (e.g. 'Donald Knuth')",
+      }),
+    ],
+    preview: {
+      select: { text: "text", attribution: "attribution" },
+      prepare({ text, attribution }) {
+        return {
+          title: text
+            ? `"${text.slice(0, 50)}${text.length > 50 ? "…" : ""}"`
+            : "Pull Quote",
+          subtitle: attribution ? `— ${attribution}` : "Pull Quote",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.videoEmbed,
+    type: "object",
+    title: "Video Embed",
+    description: "Responsive YouTube or Vimeo video embed",
+    icon: Play,
+    fields: [
+      defineField({
+        name: "url",
+        type: "url",
+        title: "Video URL",
+        description:
+          "Paste a YouTube (youtube.com or youtu.be) or Vimeo (vimeo.com) video link",
+        validation: (rule) =>
+          rule.required().uri({ scheme: ["https", "http"] }),
+      }),
+      defineField({
+        name: "caption",
+        type: "string",
+        title: "Caption (Optional)",
+        description: "Optional caption shown beneath the video player",
+      }),
+      defineField({
+        name: "autoPlay",
+        type: "boolean",
+        title: "Auto-play (Muted)",
+        initialValue: false,
+      }),
+    ],
+    preview: {
+      select: { caption: "caption", url: "url" },
+      prepare({ caption, url }) {
+        return {
+          title: caption || "Video Embed",
+          subtitle: url || "No URL provided",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.tweetEmbed,
+    type: "object",
+    title: "Tweet / X Embed",
+    description: "Embed an X / Twitter post by URL",
+    icon: MessageCircle,
+    fields: [
+      defineField({
+        name: "url",
+        type: "url",
+        title: "Tweet URL",
+        description:
+          "URL to the X/Twitter post (e.g. https://x.com/username/status/1234567890)",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "caption",
+        type: "string",
+        title: "Fallback Note (Optional)",
+      }),
+    ],
+    preview: {
+      select: { url: "url", caption: "caption" },
+      prepare({ url, caption }) {
+        return {
+          title: caption || "Tweet Embed",
+          subtitle: url || "No URL",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.fileDownload,
+    type: "object",
+    title: "File Download",
+    description: "A downloadable asset card (PDF, ZIP, source code, slides)",
+    icon: Download,
+    fields: [
+      defineField({
+        name: "file",
+        type: "file",
+        title: "File",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "label",
+        type: "string",
+        title: "Button Label",
+        description: "e.g. 'Download Paper (PDF)' or 'Get Starter Template'",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "description",
+        type: "string",
+        title: "Description (Optional)",
+        description: "Brief note about the file contents or format",
+      }),
+    ],
+    preview: {
+      select: { label: "label", filename: "file.asset.originalFilename" },
+      prepare({ label, filename }) {
+        return {
+          title: label || "Downloadable File",
+          subtitle: filename ? `File: ${filename}` : "File Download",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.mathBlock,
+    type: "object",
+    title: "Math (LaTeX)",
+    description: "Render mathematical equations using LaTeX syntax",
+    icon: Sigma,
+    fields: [
+      defineField({
+        name: "latex",
+        type: "text",
+        title: "LaTeX Expression",
+        description:
+          "e.g. \\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}",
+        rows: 3,
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "caption",
+        type: "string",
+        title: "Caption (Optional)",
+        description: "e.g. 'Equation 1: Gauss's Law'",
+      }),
+    ],
+    preview: {
+      select: { latex: "latex", caption: "caption" },
+      prepare({ latex, caption }) {
+        return {
+          title: caption || latex?.slice(0, 40) || "Math Block",
+          subtitle: latex ? `LaTeX: ${latex.slice(0, 30)}` : "Empty",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.expandable,
+    type: "object",
+    title: "Expandable Section",
+    description:
+      "Collapsible accordion / details section for supplementary content",
+    icon: ChevronDown,
+    fields: [
+      defineField({
+        name: "summary",
+        type: "string",
+        title: "Summary / Title",
+        description: "The clickable header always visible to the reader",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "content",
+        type: "array",
+        title: "Hidden Content",
+        description: "Revealed when clicked",
+        of: [
+          defineArrayMember({
+            type: "block",
+            styles: TABLE_CELL_BLOCK_STYLES,
+            marks: PORTABLE_TEXT_MARKS,
+          }),
+        ],
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "defaultOpen",
+        type: "boolean",
+        title: "Open by Default",
+        initialValue: false,
+      }),
+    ],
+    preview: {
+      select: { summary: "summary", defaultOpen: "defaultOpen" },
+      prepare({ summary, defaultOpen }) {
+        return {
+          title: summary || "Expandable Section",
+          subtitle: defaultOpen ? "Open by default" : "Collapsed",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.codeGroup,
+    type: "object",
+    title: "Code Group (Tabs)",
+    description:
+      "Multiple code files in a tabbed viewer (ideal for multi-file examples or before/after)",
+    icon: Layers,
+    fields: [
+      defineField({
+        name: "title",
+        type: "string",
+        title: "Group Title (Optional)",
+        description: "Optional heading shown above the tab bar",
+      }),
+      defineField({
+        name: "files",
+        type: "array",
+        title: "Code Files",
+        validation: (rule) => rule.required().min(1),
+        of: [
+          defineArrayMember({
+            type: "object",
+            name: "codeFile",
+            title: "File",
+            fields: [
+              defineField({
+                name: "filename",
+                type: "string",
+                title: "Filename / Tab Label",
+                description: "e.g. 'page.tsx' or 'After'",
+                validation: (rule) => rule.required(),
+              }),
+              defineField({
+                name: "language",
+                type: "string",
+                title: "Language",
+                options: { list: CODE_LANGUAGES },
+                initialValue: "ts",
+              }),
+              defineField({
+                name: "code",
+                type: "text",
+                title: "Code",
+                rows: 10,
+                validation: (rule) => rule.required(),
+              }),
+              defineField({
+                name: "highlightLines",
+                type: "string",
+                title: "Highlighted Lines (Optional)",
+                description: "Comma-separated line numbers, e.g. '2,4-7'",
+              }),
+            ],
+            preview: {
+              select: { filename: "filename", language: "language" },
+              prepare({ filename, language }) {
+                return {
+                  title: filename || "Untitled File",
+                  subtitle: language || "code",
+                };
+              },
+            },
+          }),
+        ],
+      }),
+    ],
+    preview: {
+      select: { title: "title", files: "files" },
+      prepare({ title, files }) {
+        const count = Array.isArray(files) ? files.length : 0;
+        return {
+          title: title || "Code Group",
+          subtitle: `${count} file${count === 1 ? "" : "s"} tabbed`,
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.playgroundEmbed,
+    type: "object",
+    title: "Code Playground Embed",
+    description:
+      "Live interactive sandbox (CodeSandbox, StackBlitz, or CodePen)",
+    icon: Terminal,
+    fields: [
+      defineField({
+        name: "url",
+        type: "url",
+        title: "Sandbox URL",
+        description: "Paste the URL from CodeSandbox, StackBlitz, or CodePen",
+        validation: (rule) => rule.required().uri({ scheme: ["https"] }),
+      }),
+      defineField({
+        name: "title",
+        type: "string",
+        title: "Title",
+        description: "Title / description of the sandbox for accessibility",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "provider",
+        type: "string",
+        title: "Provider",
+        options: {
+          list: [
+            { title: "CodeSandbox", value: "codesandbox" },
+            { title: "StackBlitz", value: "stackblitz" },
+            { title: "CodePen", value: "codepen" },
+          ],
+          layout: "radio",
+        },
+        initialValue: "codesandbox",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "height",
+        type: "number",
+        title: "Height (px)",
+        initialValue: 500,
+        validation: (rule) => rule.min(250).max(900),
+      }),
+    ],
+    preview: {
+      select: { title: "title", provider: "provider", url: "url" },
+      prepare({ title, provider, url }) {
+        return {
+          title: title || "Playground Embed",
+          subtitle: `${provider || "Sandbox"}: ${url || ""}`,
         };
       },
     },

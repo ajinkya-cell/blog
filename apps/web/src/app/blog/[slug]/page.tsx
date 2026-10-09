@@ -23,11 +23,8 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { AuthorBioCard } from "@/components/author-bio-card";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import {
-  MobileTableOfContent,
-  TableOfContent,
-} from "@/components/elements/table-of-content";
+import { BreadcrumbsJsonLd } from "@/components/breadcrumbs";
+import { CollapsibleTableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { PostNavigation, type PostLinkItem } from "@/components/post-navigation";
 import { ReadingProgress } from "@/components/reading-progress";
@@ -191,7 +188,8 @@ function BlogPageContent({
   data: BlogPageData;
   adjacent?: { previous: PostLinkItem; next: PostLinkItem };
 }>) {
-  const { title, richText, publishedAt, _updatedAt, tags, readTime } = data ?? {};
+  const { title, richText, publishedAt, _updatedAt, tags, readTime, image } =
+    data ?? {};
   const author = data?.authors;
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(_updatedAt);
@@ -199,59 +197,61 @@ function BlogPageContent({
   const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
 
   return (
-    <main className="bg-background">
+    <main className="bg-background font-sans text-foreground antialiased">
       <ReadingProgress />
       <ArticleJsonLd article={data} />
-      <Breadcrumbs
+      <BreadcrumbsJsonLd
         crumbs={[
           { label: "Home", href: "/" },
           { label: "Blog", href: "/blog" },
           { label: title },
         ]}
       />
-      <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
-        <header className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-2">
-            {tags && tags.length > 0
-              ? tags.map((tag) => (
-                  <span
-                    className="border border-border bg-muted/50 px-2 py-0.5 font-mono text-muted-foreground text-xs"
-                    key={tag}
-                  >
-                    #{tag}
-                  </span>
-                ))
-              : null}
-          </div>
 
-          <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+      <div className="container max-w-4xl pt-8 pb-24 sm:pt-12 md:pb-32">
+        {/* Top Featured Hero Image with Bottom Fade */}
+        {image?.id ? (
+          <div className="relative mx-auto mb-10 w-full overflow-hidden rounded-2xl border border-border/40 shadow-sm sm:mb-12 sm:rounded-3xl">
+            <div className="relative aspect-[16/9] w-full sm:aspect-[21/9] md:h-[420px]">
+              <SanityImage
+                alt={image?.alt || title || "Featured image"}
+                className="h-full w-full object-cover"
+                height={840}
+                image={image}
+                sizes="(min-width: 1024px) 896px, 100vw"
+                width={1680}
+              />
+              {/* Bottom gradient fade blending into page background */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+            </div>
+          </div>
+        ) : null}
+
+        {/* Centered Blog Header */}
+        <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center font-sans">
+          {tags && tags.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {tags.map((tag) => (
+                <span
+                  className="rounded-full border border-border/60 bg-muted/60 px-3 py-0.5 font-mono text-muted-foreground text-xs"
+                  key={tag}
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <h1 className="text-balance font-sans font-semibold text-3xl tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[2.75rem] lg:leading-[1.15]">
             {title}
           </h1>
 
-          <div className="flex flex-col gap-4">
-            <dl className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
-              {publishedDate && (
-                <div className="flex gap-1.5">
-                  <dt className="text-muted-foreground">Published:</dt>
-                  <dd className="text-foreground/90">{publishedDate}</dd>
-                </div>
-              )}
-              {updatedDate && updatedDate !== publishedDate && (
-                <div className="flex gap-1.5">
-                  <dt className="text-muted-foreground">Updated:</dt>
-                  <dd className="text-foreground/90">{updatedDate}</dd>
-                </div>
-              )}
-              <div className="flex gap-1.5 font-mono text-muted-foreground text-xs">
-                <dt>Read time:</dt>
-                <dd className="text-foreground/90">{estimatedMinutes} min</dd>
-              </div>
-            </dl>
-
-            {author?.name && (
-              <div className="flex items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 text-sm text-muted-foreground">
+            {author?.name ? (
+              <div className="flex items-center gap-2.5">
                 {author.image?.id ? (
-                  <span className="inline-block size-7 overflow-hidden rounded-full">
+                  <span className="inline-block size-7 overflow-hidden rounded-full ring-1 ring-border">
                     <SanityImage
                       alt={author.name}
                       className="size-7 rounded-full object-cover"
@@ -266,31 +266,46 @@ function BlogPageContent({
                     {author.name.charAt(0)}
                   </span>
                 )}
-                <div className="flex flex-col">
-                  <span className="font-medium text-foreground text-sm">
-                    {author.name}
-                  </span>
-                  {author.position ? (
-                    <span className="text-muted-foreground text-xs">
-                      {author.position}
-                    </span>
-                  ) : null}
-                </div>
+                <span className="font-medium text-foreground text-sm">
+                  {author.name}
+                </span>
               </div>
-            )}
+            ) : null}
+
+            {publishedDate ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-muted-foreground">Published:</span>
+                <span className="text-foreground/90">{publishedDate}</span>
+              </div>
+            ) : null}
+
+            {updatedDate && updatedDate !== publishedDate ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-muted-foreground">Updated:</span>
+                <span className="text-foreground/90">{updatedDate}</span>
+              </div>
+            ) : null}
+
+            <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+              <span>Read time:</span>
+              <span className="text-foreground/90">{estimatedMinutes} min</span>
+            </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
-          <article className="min-w-0">
-            <MobileTableOfContent
-              className="mb-12"
-              richText={richText ?? []}
-              shareTitle={title}
-              shareUrl={shareUrl}
-            />
+        {/* Centered Blog Article & Collapsible Table of Contents */}
+        <div className="mx-auto mt-10 flex w-full max-w-3xl flex-col gap-10 sm:mt-12">
+          {/* Collapsible Table of Contents */}
+          <CollapsibleTableOfContent
+            richText={richText ?? []}
+            shareTitle={title}
+            shareUrl={shareUrl}
+          />
+
+          {/* Main Article Content */}
+          <article className="min-w-0 font-sans">
             <RichText
-              className="prose-lg prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
+              className="prose-lg font-sans prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
               richText={richText as RichTextValue}
             />
 
@@ -305,16 +320,6 @@ function BlogPageContent({
               />
             </div>
           </article>
-
-          <div className="hidden lg:block">
-            <div className="sticky top-24">
-              <TableOfContent
-                richText={richText ?? []}
-                shareTitle={title}
-                shareUrl={shareUrl}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </main>

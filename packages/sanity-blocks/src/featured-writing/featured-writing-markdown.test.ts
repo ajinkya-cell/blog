@@ -22,7 +22,9 @@ test("featuredWritingToMarkdown renders post titles as markdown headings", () =>
   );
 
   expect(result).toContain("## Best Essays");
-  expect(result).toContain("### [Architecture Patterns](/blog/architecture-patterns)");
+  expect(result).toContain(
+    "### [Architecture Patterns](/blog/architecture-patterns)"
+  );
   expect(result).toContain("Category: Engineering | 6 min read");
   expect(result).toContain("Clean composable systems.");
 });

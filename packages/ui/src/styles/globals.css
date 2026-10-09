@@ -26,8 +26,9 @@
   --muted-foreground: oklch(0.442 0.017 285.786);
   --accent: var(--muted);
   --accent-foreground: var(--foreground);
-  --accent-green: oklch(0.935 0.226 122);
-  --accent-green-foreground: var(--foreground);
+  --accent-green: #7577E6;
+  --accent-brand: #7577E6;
+  --accent-green-foreground: #ffffff;
   --success: oklch(0.48 0.16 122);
   --danger: oklch(0.55 0.21 27);
   --destructive: oklch(0.577 0.245 27.325);
@@ -107,7 +108,7 @@
 }
 
 .dark {
-  --background: oklch(0 0 0);
+  --background: #050505;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: var(--foreground);
@@ -157,6 +158,8 @@
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-serif: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-instrument-serif: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
 
   --animate-marquee: marquee 40s linear infinite;
 
@@ -645,4 +648,157 @@
   .hero-enter {
     animation: none;
   }
+}
+
+/* Void UI Micro-Beveled Glass Panel */
+.site-bevel-panel {
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 16px 32px -8px rgba(0, 0, 0, 0.1);
+}
+
+:is(.dark *) .site-bevel-panel,
+.dark .site-bevel-panel {
+  background-color: #151515;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Mobile Dropdown Panel */
+.site-bevel-dropdown {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+:is(.dark *) .site-bevel-dropdown,
+.dark .site-bevel-dropdown {
+  background-color: #141414;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Smooth anchor scrolling accounting for floating pill navbar */
+html {
+  scroll-padding-top: 5rem;
+}
+
+/* Void UI Minimal 3D Beveled Chassis (Aligned with Navbar Formula) */
+.site-chassis {
+  background-color: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 16px 32px -8px rgba(0, 0, 0, 0.1);
+}
+
+:is(.dark *) .site-chassis,
+.dark .site-chassis {
+  background-color: #151515;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 16px 40px rgba(0, 0, 0, 0.32);
+}
+
+/* Void UI Tier 2: Recessed Well */
+.recessed-well {
+  background-color: #ededef;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 0.75rem;
+}
+
+:is(.dark *) .recessed-well,
+.dark .recessed-well {
+  background-color: #090909;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+}
+
+/* Void UI Tier 3: Deep Void Cutout Well / Text Inputs */
+.void-input {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+}
+
+:is(.dark *) .void-input,
+.dark .void-input {
+  background-color: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.6);
+  border-radius: 0.75rem;
+}
+
+/* Void UI Tier 0: Active Popout Button */
+.popout-btn-active {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Void UI Tier 0: Unselected Sunken Flush Button */
+.popout-btn-inactive {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+:is(.dark *) .popout-btn-inactive,
+.dark .popout-btn-inactive {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.font-instrument-serif {
+  font-family: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+.font-serif {
+  font-family: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+/* Footer: oversized outlined wordmark that fades into the page edge */
+.footer-wordmark {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--foreground) 22%, transparent);
+  mask-image: linear-gradient(to bottom, black 35%, transparent 95%);
 }

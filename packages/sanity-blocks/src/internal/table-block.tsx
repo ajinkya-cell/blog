@@ -31,7 +31,11 @@ function TableCell({
   const CellTag = isHeader ? "th" : "td";
   return (
     <CellTag
-      className="border border-border px-3 py-2 text-left align-top"
+      className={
+        isHeader
+          ? "border-border/40 border-b px-4 py-3 text-left font-mono font-semibold text-muted-foreground text-xs uppercase tracking-wider"
+          : "border-border/20 border-b px-4 py-3 text-left text-foreground/80 align-top last:border-b-0"
+      }
       scope={isHeader ? "col" : undefined}
     >
       {Array.isArray(cell.value) ? (
@@ -51,7 +55,7 @@ function TableRow({
   cellComponents: Partial<PortableTextReactComponents>;
 }>) {
   return (
-    <tr>
+    <tr className="transition-colors hover:bg-foreground/[0.02]">
       {(row.cells ?? []).map((cell) => (
         <TableCell
           cell={cell}
@@ -82,10 +86,10 @@ export function TableBlock({
   const bodyRows = rows.slice(headerRowCount);
 
   return (
-    <div className="not-prose my-6 overflow-x-auto">
+    <div className="site-chassis not-prose relative my-8 overflow-x-auto rounded-2xl">
       <table className="w-full border-collapse text-sm">
         {headRows.length > 0 ? (
-          <thead>
+          <thead className="bg-foreground/[0.03]">
             {headRows.map((row) => (
               <TableRow
                 cellComponents={cellComponents}

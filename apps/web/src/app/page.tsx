@@ -1,19 +1,18 @@
 import {
-  DRAFTS_WITHOUT_SESSION,
-  type DynamicFetchOptions,
   getDynamicFetchOptions,
-  resolvePageFetchOptions,
   sanityFetch,
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
-import { queryHomePageData } from "@workspace/sanity/query";
+import {
+  queryHomePageData,
+  queryRecentThreeBlogs,
+} from "@workspace/sanity/query";
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
-import { Suspense } from "react";
 
-import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
-import { PageBuilder } from "@/components/pagebuilder";
+import { MatrixRippleBackground } from "@/components/matrix-ripple-background";
+import { StackedBlogPreview } from "@/components/stacked-blog-preview";
 import { seoFromDocument } from "@/lib/seo";
+import type { Blog } from "@/types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { perspective } = await getDynamicFetchOptions();
@@ -24,45 +23,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return seoFromDocument(homePageData, { slug: "/" });
 }
 
-export default async function Page() {
-  const { isEnabled: isDraftMode } = await draftMode();
-
-  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return (
-      <Suspense fallback={null}>
-        <HomeContent />
-      </Suspense>
-    );
-  }
-
-  return <CachedHome perspective="published" stega={false} />;
-}
-
-async function HomeContent() {
-  const { perspective, stega } = await resolvePageFetchOptions();
-  return <CachedHome perspective={perspective} stega={stega} />;
-}
-
-async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
+async function getRecentBlogs() {
   "use cache";
-  const { data: homePageData } = await sanityFetch({
-    query: queryHomePageData,
-    perspective,
-    stega,
+  const { data } = await sanityFetch({
+    query: queryRecentThreeBlogs,
+    perspective: "published",
+    stega: false,
   });
+  return data;
+}
 
-  if (!homePageData) {
-    return <div>No home page data</div>;
-  }
-
-  const { _id, _type, pageBuilder } = homePageData ?? {};
+export default async function HomePage() {
+  const recentBlogs = await getRecentBlogs();
 
   return (
-    <>
-      <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <main className="-mt-16">
-        <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
-      </main>
-    </>
+    <div className="relative w-full overflow-hidden">
+      {/* Interactive Matrix Character Ripple Canvas */}
+      <MatrixRippleBackground />
+
+      {/* Headline higher up + 3-card scroll-driven fan-out animation */}
+      <StackedBlogPreview blogs={(recentBlogs as unknown as Blog[]) ?? []} />
+    </div>
   );
 }

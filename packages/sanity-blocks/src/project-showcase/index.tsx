@@ -186,7 +186,10 @@ export function ProjectShowcase({
 
   return (
     <section
-      className={cn("py-16 md:py-24 border-b border-border/60 bg-background", className)}
+      className={cn(
+        "py-16 md:py-24 border-b border-border/60 bg-background",
+        className
+      )}
       data-sanity={dataSanity}
     >
       <div className="container max-w-5xl">

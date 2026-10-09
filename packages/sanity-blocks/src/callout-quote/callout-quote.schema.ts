@@ -21,7 +21,8 @@ export const calloutQuoteSchema = defineType({
       name: "author",
       type: "string",
       title: "Author / Speaker",
-      description: "Who said or wrote this (e.g. 'Alan Kay', or leave blank if yourself)",
+      description:
+        "Who said or wrote this (e.g. 'Alan Kay', or leave blank if yourself)",
     }),
     defineField({
       name: "source",

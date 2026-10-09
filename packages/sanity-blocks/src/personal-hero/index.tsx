@@ -30,7 +30,7 @@ export function PersonalHero({
   return (
     <section
       className={cn(
-        "border-border/60 border-b bg-background py-16 md:py-24",
+        "relative overflow-hidden border-border/40 border-b py-16 md:py-24",
         className
       )}
       data-sanity={dataSanity}
@@ -39,29 +39,35 @@ export function PersonalHero({
         <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-12">
           {avatar?.id ? (
             <div className="relative shrink-0">
-              <div className="size-24 overflow-hidden rounded-full border-2 border-border shadow-sm md:size-28">
-                <SanityImage
-                  alt={greeting ?? "Author avatar"}
-                  className="size-full object-cover"
-                  height={112}
-                  image={avatar}
-                  loading="eager"
-                  sizes="112px"
-                  width={112}
-                />
+              <div className="relative size-24 overflow-hidden rounded-full border border-white/[0.16] bg-[#151515] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_12px_32px_rgba(0,0,0,0.5)] md:size-28">
+                <div className="size-full overflow-hidden rounded-full">
+                  <SanityImage
+                    alt={greeting ?? "Author avatar"}
+                    className="size-full object-cover"
+                    height={112}
+                    image={avatar}
+                    loading="eager"
+                    sizes="112px"
+                    width={112}
+                  />
+                </div>
               </div>
             </div>
           ) : null}
 
           <div className="flex flex-1 flex-col gap-4">
             {statusPill ? (
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border/80 bg-muted/60 px-3 py-1 font-mono text-muted-foreground text-xs">
+              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 font-medium font-mono text-emerald-400 text-xs shadow-[inset_0_1px_2px_rgba(16,185,129,0.15)]">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
                 <span>{statusPill}</span>
               </div>
             ) : null}
 
             <div className="space-y-2">
-              <h1 className="font-normal font-sans text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
+              <h1 className="font-sans font-semibold text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
                 {greeting}
               </h1>
               {tagline ? (

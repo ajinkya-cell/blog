@@ -53,8 +53,6 @@ function generatePaginationItems(
   return items;
 }
 
-const navLabelBase = "font-light text-base leading-5 transition-colors";
-
 export function BlogPagination({
   currentPage,
   totalPages,
@@ -81,15 +79,15 @@ export function BlogPagination({
   return (
     <nav
       aria-label="Blog pagination"
-      className={cn("flex items-center justify-start gap-5", className)}
+      className={cn(
+        "recessed-well inline-flex items-center gap-1 p-1",
+        className
+      )}
     >
       {hasPreviousPage ? (
         <Link
           aria-label={`Previous page, page ${currentPage - 1}`}
-          className={cn(
-            navLabelBase,
-            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
-          )}
+          className="flex h-8 items-center rounded-lg px-2.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
           href={getPageUrl(currentPage - 1)}
         >
           Previous
@@ -101,7 +99,7 @@ export function BlogPagination({
           return (
             <span
               aria-hidden="true"
-              className="font-light font-mono text-base text-zinc-400 leading-5"
+              className="flex size-8 items-center justify-center font-mono text-xs text-muted-foreground/50"
               key={item}
             >
               &hellip;
@@ -113,7 +111,7 @@ export function BlogPagination({
           return (
             <span
               aria-current="page"
-              className="flex items-center justify-center rounded-none border border-foreground px-2 pt-0.5 pb-1 font-mono text-base text-foreground leading-5 dark:border-accent-green dark:text-accent-green"
+              className="popout-btn-active flex size-8 items-center justify-center rounded-lg font-mono text-xs font-semibold shadow-sm"
               key={item}
             >
               {item}
@@ -124,7 +122,7 @@ export function BlogPagination({
         return (
           <Link
             aria-label={`Go to page ${item}`}
-            className="focus-ring rounded-none px-0.5 font-light font-mono text-base text-zinc-400 leading-5 transition-colors hover:text-foreground"
+            className="flex size-8 items-center justify-center rounded-lg font-mono text-xs text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
             href={getPageUrl(item)}
             key={item}
           >
@@ -136,10 +134,7 @@ export function BlogPagination({
       {hasNextPage ? (
         <Link
           aria-label={`Next page, page ${currentPage + 1}`}
-          className={cn(
-            navLabelBase,
-            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
-          )}
+          className="flex h-8 items-center rounded-lg px-2.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
           href={getPageUrl(currentPage + 1)}
         >
           Next
@@ -147,10 +142,7 @@ export function BlogPagination({
       ) : (
         <span
           aria-disabled="true"
-          className={cn(
-            navLabelBase,
-            "pointer-events-none select-none text-muted-foreground/40"
-          )}
+          className="pointer-events-none flex h-8 select-none items-center rounded-lg px-2.5 font-mono text-muted-foreground/30 text-xs"
         >
           Next
         </span>

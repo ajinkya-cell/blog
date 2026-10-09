@@ -206,14 +206,16 @@ export const settings = defineType({
       name: "authorBio",
       type: "text",
       title: "Site Author Bio (Short)",
-      description: "Short bio displayed in the footer or default site author prompts",
+      description:
+        "Short bio displayed in the footer or default site author prompts",
       rows: 2,
     }),
     defineField({
       name: "colophon",
       type: "text",
       title: "Colophon / Footer Note",
-      description: "Personal note or technical stack colophon rendered in the footer",
+      description:
+        "Personal note or technical stack colophon rendered in the footer",
       rows: 2,
     }),
     socialLinks,

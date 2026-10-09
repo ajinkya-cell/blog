@@ -75,34 +75,18 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   );
 
   const card = (
-    <div className="group relative min-h-[260px] overflow-hidden text-foreground transition-colors hover:bg-accent-green sm:min-h-0 sm:aspect-[360/248]">
+    <div className="site-chassis group relative min-h-[220px] overflow-hidden rounded-2xl p-6 text-foreground transition-all duration-200 hover:-translate-y-1 hover:border-white/20 sm:min-h-0 sm:aspect-[360/248]">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <span className="relative flex size-[100px] items-center justify-center bg-background text-foreground transition-colors duration-200 group-hover:bg-black group-hover:text-white">
-          <span
-            aria-hidden="true"
-            className="-top-3 -left-3 absolute size-2 border-accent-green-foreground border-r border-b opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          />
-          <span
-            aria-hidden="true"
-            className="-top-3 -right-3 absolute size-2 border-accent-green-foreground border-b border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          />
-          <span
-            aria-hidden="true"
-            className="-bottom-3 -left-3 absolute size-2 border-accent-green-foreground border-t border-r opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          />
-          <span
-            aria-hidden="true"
-            className="-right-3 -bottom-3 absolute size-2 border-accent-green-foreground border-t border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          />
+        <span className="recessed-well relative flex size-[88px] items-center justify-center rounded-2xl border border-white/[0.06] text-foreground transition-colors duration-200 group-hover:border-white/20 group-hover:text-white">
           {media}
         </span>
       </div>
-      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background px-[5px] py-[4px] font-light sm:py-[2.5px] font-mono text-foreground text-sm uppercase leading-none transition-colors duration-200 group-hover:bg-black group-hover:text-white dark:group-hover:bg-background dark:group-hover:text-foreground">
+      <span className="absolute bottom-3 left-3 flex max-w-[calc(100%-1.5rem)] items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-mono text-foreground/80 text-xs uppercase tracking-wider transition-colors duration-200 group-hover:border-white/20 group-hover:text-white">
         <span className="min-w-0 truncate">{displayLabel}</span>
         {href ? (
           <ArrowRight
             aria-hidden="true"
-            className="h-4 w-0 shrink-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:ml-1 group-hover:w-4 group-hover:opacity-100"
+            className="h-3.5 w-0 shrink-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:ml-1 group-hover:w-3.5 group-hover:opacity-100"
           />
         ) : null}
       </span>

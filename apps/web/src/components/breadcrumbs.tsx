@@ -82,13 +82,13 @@ export function Breadcrumbs({
       <BreadcrumbsJsonLd crumbs={trail} />
       <div
         className={cn(
-          "border-b-[0.75px] border-zinc-200 dark:border-zinc-900 bg-background",
+          "border-b border-border/40 bg-background/50 backdrop-blur-sm",
           className
         )}
       >
-        <div className="container flex min-h-13 items-center gap-2.5 pt-6 pb-2">
+        <div className="container flex min-h-11 items-center gap-2.5 py-2.5">
           <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
-            <ol className="flex min-w-0 items-center gap-1.5 font-light uppercase font-mono text-muted-foreground text-sm leading-5 tracking-[0.24px]">
+            <ol className="flex min-w-0 items-center gap-1.5 font-mono text-xs text-muted-foreground uppercase tracking-wider">
               {trail.map((crumb, index) => {
                 const isCurrent = index === trail.length - 1;
                 return (

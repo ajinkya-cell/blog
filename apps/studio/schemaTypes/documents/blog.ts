@@ -55,35 +55,6 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
-      name: "authors",
-      type: "array",
-      title: "Authors",
-      description: "Who wrote this blog post (select from existing authors)",
-      of: [
-        defineArrayMember({
-          type: "reference",
-          to: [
-            {
-              type: "author",
-              options: {
-                disableNew: true,
-              },
-            },
-          ],
-          options: {
-            disableNew: true,
-          },
-        }),
-      ],
-      validation: (Rule) => [
-        Rule.required(),
-        Rule.max(1),
-        Rule.min(1),
-        Rule.unique(),
-      ],
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
       name: "publishedAt",
       type: "date",
       title: "Published At",
@@ -148,6 +119,37 @@ export const blog = defineType({
         "The main content of your blog post with text, images, and formatting",
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      name: "series",
+      type: "string",
+      title: "Series (Optional)",
+      description:
+        "Name of the series this post belongs to (e.g. 'Engineering Fundamentals', 'Building in Public')",
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
+      name: "showTableOfContents",
+      type: "boolean",
+      title: "Show Table of Contents",
+      description: "Display an outline / Table of Contents on this article",
+      initialValue: true,
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
+      name: "relatedPosts",
+      type: "array",
+      title: "Related Posts",
+      description:
+        "Up to 3 hand-picked posts to recommend at the end of this article",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "blog" }],
+        }),
+      ],
+      validation: (rule) => rule.max(3),
+      group: GROUP.MAIN_CONTENT,
+    }),
     ...seoFields,
     ...ogFields,
   ],
@@ -158,7 +160,7 @@ export const blog = defineType({
       isPrivate: "seoNoIndex",
       isHidden: "seoHideFromLists",
       slug: "slug.current",
-      author: "authors.0.name",
+      category: "category",
       publishDate: "publishedAt",
     },
     prepare: ({
@@ -166,7 +168,7 @@ export const blog = defineType({
       media,
       isPrivate,
       isHidden,
-      author,
+      category,
       slug,
       publishDate,
     }) => {
@@ -177,7 +179,7 @@ export const blog = defineType({
         visibility = "🙈 Hidden";
       }
 
-      const authorInfo = author ? `✍️ ${author}` : "👻 No author";
+      const categoryInfo = category ? `🏷️ ${category}` : "";
       const dateInfo = publishDate
         ? `📅 ${new Date(publishDate).toLocaleDateString()}`
         : "⏳ Draft";
@@ -185,7 +187,14 @@ export const blog = defineType({
       return {
         title: title || "Untitled Blog",
         media,
-        subtitle: `🔗 ${slug} | ${visibility} | ${authorInfo} | ${dateInfo}`,
+        subtitle: [
+          slug ? `🔗 ${slug}` : null,
+          visibility,
+          categoryInfo,
+          dateInfo,
+        ]
+          .filter(Boolean)
+          .join(" | "),
       };
     },
   },

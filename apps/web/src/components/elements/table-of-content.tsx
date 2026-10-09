@@ -16,8 +16,6 @@ import {
   SWAP_HIDDEN,
   SWAP_LAYER,
   SWAP_SHOWN,
-  SWAP_TEXT_HIDDEN,
-  SWAP_TEXT_SHOWN,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
 import {
@@ -25,7 +23,7 @@ import {
   useDisclosureAnimation,
 } from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, ListTree } from "lucide-react";
 import {
   type FC,
   type MouseEvent,
@@ -503,20 +501,25 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   };
 
   return (
-    <li className={cn(currentDepth > 1 && "ml-3")}>
+    <li className={cn(currentDepth > 1 && "ml-2.5")}>
       <a
         aria-current={isActive ? "location" : undefined}
         className={cn(
-          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] transition-colors focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
+          "group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs transition-all cursor-pointer",
           isActive
-            ? "bg-accent-green font-medium text-accent-green-foreground"
-            : "text-muted-foreground hover:text-foreground"
+            ? "popout-btn-active font-semibold shadow-sm"
+            : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
         )}
         href={href}
         id={`${idPrefix}${id}`}
         onClick={handleClick}
       >
-        {text}
+        <span className="truncate">{text}</span>
+        {isActive ? (
+          <ChevronRight className="size-3 shrink-0 text-black" />
+        ) : (
+          <span className="size-1 shrink-0 rounded-full bg-foreground/20 opacity-0 transition-opacity group-hover:opacity-100" />
+        )}
       </a>
 
       {hasChildren && (
@@ -607,82 +610,70 @@ function ShareOptions({
   };
 
   return (
-    <div className="flex items-center justify-between border-t border-zinc-900 px-1 pt-4 dark:border-zinc-50">
-      {SHARE_TARGETS.map((target) => {
-        const shareClass =
-          "focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground";
-        if (target.webShare) {
+    <div className="recessed-well flex items-center justify-between p-1.5">
+      <div className="flex items-center gap-1">
+        {SHARE_TARGETS.map((target) => {
+          const shareClass =
+            "flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground";
+          if (target.webShare) {
+            return (
+              <button
+                aria-label={`Share on ${target.network}`}
+                className={shareClass}
+                key={target.network}
+                onClick={() =>
+                  handleWebShare(target.url(encodedUrl, encodedTitle))
+                }
+                title={`Share on ${target.network}`}
+                type="button"
+              >
+                <target.icon className="size-3.5" />
+              </button>
+            );
+          }
           return (
-            <button
+            <a
               aria-label={`Share on ${target.network}`}
               className={shareClass}
+              href={target.url(encodedUrl, encodedTitle)}
               key={target.network}
-              onClick={() =>
-                handleWebShare(target.url(encodedUrl, encodedTitle))
-              }
-              type="button"
+              rel="noopener noreferrer"
+              target="_blank"
+              title={`Share on ${target.network}`}
             >
-              <target.icon className="size-4.5" />
-              <span className="text-xs tracking-[0.02em]">{target.label}</span>
-            </button>
+              <target.icon className="size-3.5" />
+            </a>
           );
-        }
-        return (
-          <a
-            aria-label={`Share on ${target.network}`}
-            className={shareClass}
-            href={target.url(encodedUrl, encodedTitle)}
-            key={target.network}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <target.icon className="size-4.5" />
-            <span className="text-xs tracking-[0.02em]">{target.label}</span>
-          </a>
-        );
-      })}
+        })}
+      </div>
       <button
         aria-label="Copy link to clipboard"
         className={cn(
-          "focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground",
+          "flex h-7 items-center gap-1 rounded-lg px-2 text-muted-foreground text-xs transition-colors hover:bg-foreground/5 hover:text-foreground",
           COPY_STATUS_CLASS[copyStatus]
         )}
         onClick={copy}
+        title="Copy article link"
         type="button"
       >
-        <span aria-hidden="true" className="grid size-4.5 place-items-center">
+        <span aria-hidden="true" className="grid size-3.5 place-items-center">
           <Check
             className={cn(
               SWAP_LAYER,
-              "size-4.5",
+              "size-3.5",
               copied ? SWAP_SHOWN : SWAP_HIDDEN
             )}
           />
           <CopyIcon
             className={cn(
               SWAP_LAYER,
-              "size-4.5",
+              "size-3.5",
               copied ? SWAP_HIDDEN : SWAP_SHOWN
             )}
           />
         </span>
-        <span aria-hidden="true" className="grid text-xs tracking-[0.02em]">
-          <span
-            className={cn(
-              SWAP_LAYER,
-              copied ? SWAP_TEXT_SHOWN : SWAP_TEXT_HIDDEN
-            )}
-          >
-            Copied
-          </span>
-          <span
-            className={cn(
-              SWAP_LAYER,
-              copied ? SWAP_TEXT_HIDDEN : SWAP_TEXT_SHOWN
-            )}
-          >
-            Copy
-          </span>
+        <span aria-hidden="true" className="font-mono text-[10px]">
+          {copied ? "Copied" : "Copy"}
         </span>
         <output className="sr-only">
           {copyStatus === "copied" ? "Link copied to clipboard" : ""}
@@ -708,49 +699,50 @@ export const TableOfContent: FC<TableOfContentProps> = ({
   const slugKey = flattenSlugs(headings).join("|");
   const activeSlug = useActiveHeading(slugKey);
 
-  if (error) {
-    return null;
-  }
-
-  if (!shouldShow || headings.length === 0) {
+  if (error || !shouldShow || headings.length === 0) {
     return null;
   }
 
   return (
-    <div
+    <nav
+      aria-label="Table of contents"
       className={cn(
-        "bg-grid-dots p-6 text-zinc-800 dark:text-zinc-50",
+        "site-chassis relative w-full overflow-hidden rounded-2xl font-sans select-none",
         className
       )}
     >
-      <aside
-        aria-labelledby="toc-heading"
-        className="flex flex-col gap-12 bg-background p-4"
-      >
-        <nav aria-labelledby="toc-heading">
-          <p className="text-foreground text-lg" id="toc-heading">
-            On this page
-          </p>
-          <ul className="mt-6 flex flex-col gap-2">
-            {headings.map((heading, index) => (
-              <TableOfContentAnchor
-                activeSlug={activeSlug}
-                currentDepth={1}
-                heading={heading}
-                key={heading.id || `${heading.text}-${index}`}
-                maxDepth={maxDepth}
-              />
-            ))}
-          </ul>
-        </nav>
+      {/* Header */}
+      <div className="flex items-center gap-2 border-border/40 border-b bg-foreground/[0.02] px-4 py-3">
+        <ListTree className="size-3.5 text-muted-foreground" />
+        <span className="font-mono font-semibold text-[11px] text-muted-foreground tracking-wider uppercase">
+          On This Page
+        </span>
+      </div>
 
+      {/* Links List */}
+      <div className="max-h-[60vh] space-y-1 overflow-y-auto p-2">
+        <ul className="flex flex-col gap-1">
+          {headings.map((heading, index) => (
+            <TableOfContentAnchor
+              activeSlug={activeSlug}
+              currentDepth={1}
+              heading={heading}
+              key={heading.id || `${heading.text}-${index}`}
+              maxDepth={maxDepth}
+            />
+          ))}
+        </ul>
+      </div>
+
+      {/* Share Tray */}
+      <div className="border-border/40 border-t p-2">
         <ShareOptions shareUrl={shareUrl} title={shareTitle} />
-      </aside>
-    </div>
+      </div>
+    </nav>
   );
 };
 
-export const MobileTableOfContent: FC<TableOfContentProps> = ({
+export const CollapsibleTableOfContent: FC<TableOfContentProps> = ({
   richText,
   className,
   maxDepth = DEFAULT_MAX_DEPTH,
@@ -764,7 +756,7 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
 
   const slugKey = flattenSlugs(headings).join("|");
   const activeSlug = useActiveHeading(slugKey);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const { detailsRef, contentRef } = useDisclosureAnimation(open);
 
   if (error || !shouldShow || headings.length === 0) {
@@ -779,46 +771,59 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
   return (
     <details
       className={cn(
-        "bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        "site-chassis relative w-full overflow-hidden rounded-2xl border border-border/40 font-sans transition-all",
         className
       )}
-      open
+      open={open}
       ref={detailsRef}
     >
       {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
       <summary
-        className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden"
+        className="flex cursor-pointer list-none items-center justify-between gap-2 bg-foreground/[0.02] px-4 py-3 font-mono font-semibold text-[11px] text-muted-foreground tracking-wider uppercase transition-colors hover:bg-foreground/[0.04] hover:text-foreground [&::-webkit-details-marker]:hidden"
         onClick={handleSummaryClick}
       >
-        On this page
-        <ChevronDown
-          aria-hidden="true"
-          className={cn(
-            "size-5 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180"
-          )}
-        />
+        <div className="flex items-center gap-2">
+          <ListTree className="size-3.5 text-muted-foreground" />
+          <span>Table of Contents</span>
+          <span className="font-mono text-[10px] text-muted-foreground/60">
+            ({headings.length})
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] text-muted-foreground/70 lowercase">
+            {open ? "collapse" : "expand"}
+          </span>
+          <ChevronDown
+            aria-hidden="true"
+            className={cn(
+              "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+              open && "rotate-180"
+            )}
+          />
+        </div>
       </summary>
-      <div className="overflow-hidden" ref={contentRef}>
-        <div className="flex flex-col gap-8 bg-background px-4 pb-4">
-          <nav aria-label="On this page">
-            <ul className="flex flex-col gap-2">
-              {headings.map((heading, index) => (
-                <TableOfContentAnchor
-                  activeSlug={activeSlug}
-                  currentDepth={1}
-                  heading={heading}
-                  idPrefix="mobile-"
-                  key={heading.id || `${heading.text}-${index}`}
-                  maxDepth={maxDepth}
-                  onNavigate={() => setOpen(false)}
-                />
-              ))}
-            </ul>
-          </nav>
-          <ShareOptions shareUrl={shareUrl} title={shareTitle} />
+      <div className="border-border/40 border-t overflow-hidden" ref={contentRef}>
+        <div className="space-y-3 p-3">
+          <ul className="flex flex-col gap-1 max-h-[50vh] overflow-y-auto pr-1">
+            {headings.map((heading, index) => (
+              <TableOfContentAnchor
+                activeSlug={activeSlug}
+                currentDepth={1}
+                heading={heading}
+                idPrefix="toc-"
+                key={heading.id || `${heading.text}-${index}`}
+                maxDepth={maxDepth}
+                onNavigate={() => setOpen(false)}
+              />
+            ))}
+          </ul>
+          <div className="border-border/40 border-t pt-2">
+            <ShareOptions shareUrl={shareUrl} title={shareTitle} />
+          </div>
         </div>
       </div>
     </details>
   );
 };
+
+export const MobileTableOfContent = CollapsibleTableOfContent;

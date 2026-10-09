@@ -37,13 +37,42 @@ export interface PortableTextNode {
   code?: string | null;
   language?: string | null;
   filename?: string | null;
+  highlightLines?: string | null;
   // Table fields.
   headerRows?: number | null;
   rows?: PortableTextTableRow[] | null;
   // Callout fields.
   title?: string | null;
   type?: string | null;
-  content?: string | null;
+  content?: string | PortableTextNode[] | null;
+  // Divider
+  styleVariant?: string | null;
+  // Pull quote
+  text?: string | null;
+  attribution?: string | null;
+  // Video / Tweet
+  url?: string | null;
+  autoPlay?: boolean | null;
+  // File download
+  label?: string | null;
+  description?: string | null;
+  // Math
+  latex?: string | null;
+  // Expandable
+  summary?: string | null;
+  defaultOpen?: boolean | null;
+  // Code group
+  files?:
+    | {
+        filename?: string | null;
+        language?: string | null;
+        code?: string | null;
+        highlightLines?: string | null;
+      }[]
+    | null;
+  // Playground
+  provider?: string | null;
+  height?: number | null;
 }
 
 export interface PortableTextTableRow {
@@ -202,6 +231,8 @@ export function portableTextToMarkdown(
       },
       // Underline has no Markdown equivalent — emit plain text, not `<u>`.
       underline: ({ children }) => children,
+      "strike-through": ({ children }) => `~~${children}~~`,
+      highlight: ({ children }) => `==${children}==`,
     },
     types: {
       code: ({ value }) => {
@@ -212,9 +243,98 @@ export function portableTextToMarkdown(
         }
         return fenceCodeBlock(code, node.language);
       },
+      codeGroup: ({ value }) => {
+        const node = value as PortableTextNode;
+        const files = node.files ?? [];
+        if (files.length === 0) {
+          return "";
+        }
+        const sections: string[] = [];
+        if (node.title?.trim()) {
+          sections.push(`### ${node.title.trim()}`);
+        }
+        for (const file of files) {
+          if (file?.code?.trim()) {
+            if (file.filename) {
+              sections.push(`**${file.filename}**`);
+            }
+            sections.push(fenceCodeBlock(file.code, file.language));
+          }
+        }
+        return sections.join("\n\n");
+      },
       table: ({ value }) => renderTable(value as PortableTextNode, options),
+      divider: () => "---",
+      pullQuote: ({ value }) => {
+        const node = value as PortableTextNode;
+        const text = (node.text ?? "").trim();
+        if (!text) {
+          return "";
+        }
+        const lines = [`> "${text}"`];
+        if (node.attribution?.trim()) {
+          lines.push(`> — ${node.attribution.trim()}`);
+        }
+        return lines.join("\n");
+      },
+      videoEmbed: ({ value }) => {
+        const node = value as PortableTextNode;
+        const url = (node.url ?? "").trim();
+        if (!url) {
+          return "";
+        }
+        const label = node.caption?.trim() || "Video";
+        return `[Video: ${label}](${formatUrl(url)})`;
+      },
+      tweetEmbed: ({ value }) => {
+        const node = value as PortableTextNode;
+        const url = (node.url ?? "").trim();
+        if (!url) {
+          return "";
+        }
+        const label = node.caption?.trim() || "Post on X";
+        return `[${label}](${formatUrl(url)})`;
+      },
+      fileDownload: ({ value }) => {
+        const node = value as PortableTextNode;
+        const url = (node.url ?? "").trim();
+        if (!url) {
+          return "";
+        }
+        const label = node.label?.trim() || "Download File";
+        const desc = node.description?.trim();
+        return desc
+          ? `[Download: ${label}](${formatUrl(url)})\n\n_${desc}_`
+          : `[Download: ${label}](${formatUrl(url)})`;
+      },
+      mathBlock: ({ value }) => {
+        const node = value as PortableTextNode;
+        const latex = (node.latex ?? "").trim();
+        if (!latex) {
+          return "";
+        }
+        const caption = node.caption?.trim();
+        const block = `$$\n${latex}\n$$`;
+        return caption ? `${block}\n\n_${caption}_` : block;
+      },
+      expandable: ({ value }) => {
+        const node = value as PortableTextNode;
+        const summary = node.summary?.trim() || "Details";
+        const contentMd = Array.isArray(node.content)
+          ? portableTextToMarkdown(node.content, options)
+          : "";
+        return `<details>\n<summary>${summary}</summary>\n\n${contentMd}\n</details>`;
+      },
+      playgroundEmbed: ({ value }) => {
+        const node = value as PortableTextNode;
+        const url = (node.url ?? "").trim();
+        if (!url) {
+          return "";
+        }
+        const title = node.title?.trim() || "Interactive Code Sandbox";
+        return `[Playground: ${title}](${formatUrl(url)})`;
+      },
       // Sanity images carry `{id, alt, caption}`, not `{src, alt, title}`.
-      // Resolve the CDN URL via the caller-supplied resolver when available.
       image: ({ value, isInline }) => {
         if (isInline) {
           return "";
@@ -235,20 +355,25 @@ export function portableTextToMarkdown(
         return caption || alt;
       },
       callout: ({ value }) => {
-        const node = value as {
-          title?: string | null;
-          type?: string | null;
-          content?: string | null;
-        };
-        const content = (node.content ?? "").trim();
-        if (!content) {
-          return "";
-        }
+        const node = value as PortableTextNode;
         const lines: string[] = [];
         if (node.title?.trim()) {
           lines.push(`**${node.title.trim()}**`);
         }
-        lines.push(...content.split("\n"));
+        if (typeof node.content === "string") {
+          const content = node.content.trim();
+          if (content) {
+            lines.push(...content.split("\n"));
+          }
+        } else if (Array.isArray(node.content)) {
+          const contentMd = portableTextToMarkdown(node.content, options);
+          if (contentMd) {
+            lines.push(...contentMd.split("\n"));
+          }
+        }
+        if (lines.length === 0) {
+          return "";
+        }
         return lines.map((line) => (line ? `> ${line}` : ">")).join("\n");
       },
     },

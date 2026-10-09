@@ -55,6 +55,71 @@ export const richTextFragment = /* groq */ `
       ${imageFields},
       "caption": caption
     },
+    _type == "callout" => {
+      ...,
+      content[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      }
+    },
+    _type == "divider" => {
+      style
+    },
+    _type == "pullQuote" => {
+      text,
+      attribution
+    },
+    _type == "videoEmbed" => {
+      url,
+      caption,
+      autoPlay
+    },
+    _type == "tweetEmbed" => {
+      url,
+      caption
+    },
+    _type == "fileDownload" => {
+      "url": file.asset->url,
+      "originalFilename": file.asset->originalFilename,
+      "size": file.asset->size,
+      "extension": file.asset->extension,
+      label,
+      description
+    },
+    _type == "mathBlock" => {
+      latex,
+      caption
+    },
+    _type == "expandable" => {
+      summary,
+      content[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      },
+      defaultOpen
+    },
+    _type == "codeGroup" => {
+      title,
+      files[]{
+        _key,
+        filename,
+        language,
+        code,
+        highlightLines
+      }
+    },
+    _type == "playgroundEmbed" => {
+      url,
+      title,
+      provider,
+      height
+    },
     _type == "table" => {
       ...,
       rows[]{

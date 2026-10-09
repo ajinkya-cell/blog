@@ -34,11 +34,11 @@ function SubscribeNewsletterButton() {
   return (
     <Button
       aria-label={pending ? "Subscribing..." : "Subscribe to newsletter"}
-      className="shrink-0 rounded-none px-5 py-2.5"
+      className="popout-btn-active shrink-0 rounded-xl px-5 py-2 font-mono text-xs font-semibold shadow-sm transition-transform active:scale-95"
       disabled={pending}
       size="sm"
       type="submit"
-      variant="secondary"
+      variant="default"
     >
       {pending ? (
         <LoaderCircle
@@ -62,38 +62,39 @@ function TestimonialPanel({
 }: Readonly<{ testimonial: NewsletterTestimonial }>) {
   const { eyebrow, quote, authorImage, authorName, authorRole } = testimonial;
   return (
-    <div className="bleed-x bg-grid-dots p-[var(--container-px,0.5rem)] text-zinc-800 lg:mx-0 lg:p-8 dark:text-zinc-50">
-      <div className="flex h-full flex-col gap-12 bg-background p-8">
+    <div className="recessed-well relative overflow-hidden rounded-2xl border border-white/[0.06] p-6 sm:p-8">
+      <div className="flex flex-col gap-6">
         <BlockEyebrow eyebrow={eyebrow} />
-        <div className="flex flex-col gap-8">
-          <RichText
-            className="body-text text-muted-foreground [&_strong]:font-normal [&_strong]:text-foreground"
-            richText={quote}
-          />
-          <div className="flex items-center gap-4">
-            {authorImage?.id && (
-              <div className="size-[42px] shrink-0 overflow-hidden">
-                <SanityImage
-                  className="h-full w-full rounded-none! object-cover"
-                  height={42}
-                  image={authorImage}
-                  loading="lazy"
-                  width={42}
-                />
-              </div>
-            )}
-            <div className="flex flex-col text-base leading-6">
-              {authorName && (
-                <span className="font-medium text-foreground" data-inline-edit>
-                  {authorName}
-                </span>
-              )}
-              {authorRole && (
-                <span className="text-muted-foreground" data-inline-edit>
-                  {authorRole}
-                </span>
-              )}
+        <RichText
+          className="body-text text-muted-foreground [&_strong]:font-normal [&_strong]:text-foreground"
+          richText={quote}
+        />
+        <div className="flex items-center gap-3.5 border-border/20 border-t pt-3">
+          {authorImage?.id && (
+            <div className="size-10 shrink-0 overflow-hidden rounded-full border border-white/[0.12] bg-[#151515] p-0.5 shadow-sm">
+              <SanityImage
+                className="size-full rounded-full object-cover"
+                height={40}
+                image={authorImage}
+                loading="lazy"
+                width={40}
+              />
             </div>
+          )}
+          <div className="flex flex-col text-sm">
+            {authorName && (
+              <span className="font-semibold text-foreground" data-inline-edit>
+                {authorName}
+              </span>
+            )}
+            {authorRole && (
+              <span
+                className="font-mono text-muted-foreground text-xs"
+                data-inline-edit
+              >
+                {authorRole}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -122,19 +123,23 @@ export function SubscribeNewsletter({
   );
 
   return (
-    <section className="block-section" id="subscribe">
-      <div className="container">
+    <section
+      className="border-border/40 border-b py-16 md:py-24"
+      id="subscribe"
+    >
+      <div className="container max-w-5xl">
         <div
           className={cn(
+            "site-chassis relative overflow-hidden rounded-3xl p-8 sm:p-12",
             hasTestimonialContent &&
-              "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-48"
+              "grid items-center gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-16"
           )}
         >
-          <div className="flex max-w-3xl flex-col items-start gap-8 pb-12">
-            <div className="flex flex-col items-start gap-5">
+          <div className="flex flex-col items-start gap-6">
+            <div className="flex flex-col items-start gap-3">
               {title && (
                 <h2
-                  className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl"
+                  className="text-balance font-bold font-sans text-3xl text-foreground tracking-tight sm:text-4xl"
                   data-inline-edit
                 >
                   {title}
@@ -142,7 +147,7 @@ export function SubscribeNewsletter({
               )}
               {subTitle && (
                 <RichText
-                  className="body-text max-w-[360px] text-muted-foreground"
+                  className="body-text text-muted-foreground text-sm leading-relaxed"
                   richText={subTitle}
                 />
               )}
@@ -150,13 +155,13 @@ export function SubscribeNewsletter({
             <div className="flex w-full flex-col items-start gap-3">
               <form
                 action={action}
-                className="flex w-full items-center gap-1.5 bg-muted py-1.5 pr-1.5 pl-4 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
+                className="void-input flex w-full max-w-md items-center gap-2 rounded-2xl p-1.5 pl-4 focus-within:ring-2 focus-within:ring-white/20"
                 method={method ?? "post"}
                 onSubmit={onSubmit}
               >
                 <input
                   aria-label="Email address"
-                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-base text-foreground outline-none [--autofill-bg:var(--muted)] placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 font-mono text-foreground text-xs outline-none placeholder:text-muted-foreground"
                   name="email"
                   placeholder="Enter your email address"
                   required
@@ -166,7 +171,7 @@ export function SubscribeNewsletter({
               </form>
               {helperText && (
                 <RichText
-                  className="text-muted-foreground text-sm leading-5 [&_a]:rounded-none [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
+                  className="text-muted-foreground text-xs leading-5 [&_a]:underline"
                   richText={helperText}
                 />
               )}

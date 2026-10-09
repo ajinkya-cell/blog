@@ -9,7 +9,8 @@ export function ReadingProgress() {
     let ticking = false;
 
     const updateProgress = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
       const totalScroll = scrollHeight - clientHeight;
       if (totalScroll <= 0) {
         setProgress(0);

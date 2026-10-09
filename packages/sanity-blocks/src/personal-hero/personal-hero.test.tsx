@@ -12,7 +12,9 @@ test("PersonalHero renders primary greeting and tagline", () => {
   );
 
   expect(html).toMatch(/Hey, I&#x27;m Alex|Hey, I'm Alex/);
-  expect(html).toMatch(/Software builder &amp; writer|Software builder & writer/);
+  expect(html).toMatch(
+    /Software builder &amp; writer|Software builder & writer/
+  );
   expect(html).toMatch(/Read Essays/);
   expect(html).toMatch(/Available/);
 });

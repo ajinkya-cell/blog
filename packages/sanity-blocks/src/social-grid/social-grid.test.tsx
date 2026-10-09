@@ -32,7 +32,7 @@ test("SocialGrid renders the header and social cards", () => {
   expect(html).toMatch(/GitHub/);
   expect(html).toMatch(/href="https:\/\/reddit\.com\/r\/example"/);
   expect(html).toContain('target="_blank"');
-  expect(html).toContain("bg-accent-green");
+  expect(html).toContain("site-chassis");
 });
 
 test("SocialGrid renders a card without a link", () => {

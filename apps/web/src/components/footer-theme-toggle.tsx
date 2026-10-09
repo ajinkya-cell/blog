@@ -3,7 +3,7 @@
 import { cn } from "@workspace/tailwind-config/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useRef, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 const THEMES = [
   { value: "light", label: "Light", Icon: Sun },
@@ -25,30 +25,9 @@ const useMounted = () =>
 export function FooterThemeToggle() {
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
-  const pillRef = useRef<HTMLSpanElement | null>(null);
-
-  // Ref on the active button, so it runs before paint whenever active moves.
-  const placePill = (el: HTMLButtonElement | null) => {
-    const pill = pillRef.current;
-    if (el && pill) {
-      pill.style.left = `${el.offsetLeft}px`;
-      pill.style.width = `${el.offsetWidth}px`;
-    }
-  };
 
   return (
-    <div className="relative grid grid-flow-col items-center rounded-full border border-accent-green-foreground/40">
-      <span
-        aria-hidden="true"
-        className={cn(
-          "-translate-y-1/2 absolute top-1/2 h-8 rounded-full bg-accent-green-foreground",
-          // `!` beats the transition kill from `disableTransitionOnChange`.
-          "motion-safe:transition-[left,width]! motion-safe:duration-300! motion-safe:ease-[var(--ease-spring)]!",
-          // hidden until placed so the pill doesn't fly in from the left.
-          !mounted && "hidden"
-        )}
-        ref={pillRef}
-      />
+    <div className="recessed-well flex items-center gap-1 p-1">
       {THEMES.map(({ value, label, Icon }) => {
         const active = mounted && theme === value;
         return (
@@ -56,22 +35,17 @@ export function FooterThemeToggle() {
             aria-label={`Switch to ${label} theme`}
             aria-pressed={active}
             className={cn(
-              "focus-ring-inset relative z-10 rounded-full p-2 transition-colors duration-150 ease-out",
+              "flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-xs transition-all",
               active
-                ? "focus-visible:outline-accent-green!"
-                : "hover:bg-accent-green-foreground/10 focus-visible:outline-accent-green-foreground!"
+                ? "popout-btn-active font-semibold shadow-sm"
+                : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
             )}
             key={value}
             onClick={() => setTheme(value)}
-            ref={active ? placePill : undefined}
             type="button"
           >
-            <Icon
-              className={cn(
-                "size-4",
-                active ? "text-accent-green" : "text-accent-green-foreground/70"
-              )}
-            />
+            <Icon className="size-3.5" />
+            <span className="hidden sm:inline">{label}</span>
           </button>
         );
       })}

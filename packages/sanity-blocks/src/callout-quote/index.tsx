@@ -22,27 +22,29 @@ export function CalloutQuote({
 
   return (
     <section
-      className={cn("py-12 md:py-16 bg-background", className)}
+      className={cn("border-border/40 border-b py-12 md:py-16", className)}
       data-sanity={dataSanity}
     >
       <div className="container max-w-3xl">
-        <blockquote className="relative rounded-none border-l-2 border-foreground/30 bg-muted/20 pl-6 py-4 md:pl-8">
+        <blockquote className="site-chassis relative overflow-hidden rounded-2xl p-6 sm:p-8">
           <Quote
             aria-hidden="true"
-            className="size-6 text-muted-foreground/30 mb-2"
+            className="mb-3 size-6 text-foreground/20"
           />
-          <p className="font-serif italic text-xl md:text-2xl text-foreground leading-relaxed">
+          <p className="font-sans italic text-foreground text-xl leading-relaxed sm:text-2xl">
             “{quote}”
           </p>
 
           {(author || source) && (
-            <footer className="mt-4 text-xs font-mono text-muted-foreground">
-              {author && <span className="font-medium text-foreground">{author}</span>}
-              {author && source && <span>, </span>}
+            <footer className="mt-5 flex items-center gap-1.5 font-mono text-muted-foreground text-xs">
+              {author && (
+                <span className="font-semibold text-foreground">{author}</span>
+              )}
+              {author && source && <span>—</span>}
               {source &&
                 (sourceUrl ? (
                   <a
-                    className="focus-ring underline underline-offset-2 hover:text-foreground"
+                    className="focus-ring underline underline-offset-2 hover:text-white"
                     href={sourceUrl}
                     rel="noopener noreferrer"
                     target="_blank"

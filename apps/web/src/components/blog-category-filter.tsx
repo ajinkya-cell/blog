@@ -10,7 +10,10 @@ export function BlogCategoryFilter({
   return (
     <nav
       aria-label="Filter posts by category"
-      className={cn("grid gap-2", className)}
+      className={cn(
+        "recessed-well flex flex-wrap gap-1.5 rounded-xl p-1.5",
+        className
+      )}
     >
       {BLOG_CATEGORIES.map(({ label, value }) => {
         const isActive = activeCategory === value;
@@ -20,10 +23,10 @@ export function BlogCategoryFilter({
           <Link
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "focus-ring inline-flex w-max items-center rounded-none px-1 py-px font-mono text-sm uppercase tracking-wide transition-colors",
+              "inline-flex items-center rounded-lg px-3 py-1.5 font-mono text-xs tracking-wide transition-all",
               isActive
-                ? "bg-accent-green text-accent-green-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "popout-btn-active font-semibold shadow-sm"
+                : "popout-btn-inactive hover:bg-foreground/5 hover:text-foreground"
             )}
             href={href}
             key={value || "all"}

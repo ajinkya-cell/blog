@@ -66,6 +66,71 @@ const richTextFragment = /* groq */ `
       ${imageFields},
       "caption": caption
     },
+    _type == "callout" => {
+      ...,
+      content[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      }
+    },
+    _type == "divider" => {
+      style
+    },
+    _type == "pullQuote" => {
+      text,
+      attribution
+    },
+    _type == "videoEmbed" => {
+      url,
+      caption,
+      autoPlay
+    },
+    _type == "tweetEmbed" => {
+      url,
+      caption
+    },
+    _type == "fileDownload" => {
+      "url": file.asset->url,
+      "originalFilename": file.asset->originalFilename,
+      "size": file.asset->size,
+      "extension": file.asset->extension,
+      label,
+      description
+    },
+    _type == "mathBlock" => {
+      latex,
+      caption
+    },
+    _type == "expandable" => {
+      summary,
+      content[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      },
+      defaultOpen
+    },
+    _type == "codeGroup" => {
+      title,
+      files[]{
+        _key,
+        filename,
+        language,
+        code,
+        highlightLines
+      }
+    },
+    _type == "playgroundEmbed" => {
+      url,
+      title,
+      provider,
+      height
+    },
     _type == "table" => {
       ...,
       rows[]{
@@ -86,7 +151,7 @@ const richTextFragment = /* groq */ `
 `;
 
 const blogAuthorFragment = /* groq */ `
-  authors[0]->{
+  "authors": *[_type == "author" && (_id in ["author", "author-ajinkya"])][0]{
     _id,
     name,
     position,
@@ -219,6 +284,12 @@ export const queryAllBlogDataForSearch = defineQuery(`
   }
 `);
 
+export const queryRecentThreeBlogs = defineQuery(`
+  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(publishedAt desc, _createdAt desc)[0...3]{
+    ${blogCardFragment}
+  }
+`);
+
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
@@ -228,6 +299,11 @@ export const queryBlogSlugPageData = defineQuery(`
     orderRank,
     tags,
     readTime,
+    series,
+    showTableOfContents,
+    relatedPosts[]->{
+      ${blogCardFragment}
+    },
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -380,24 +456,6 @@ export const queryRedirects = defineQuery(`
   }
 `);
 
-export const queryAllProjects = defineQuery(`
-  *[_type == "project" && defined(slug.current)] | order(orderRank asc){
-    _id,
-    _type,
-    title,
-    description,
-    "slug": slug.current,
-    year,
-    status,
-    category,
-    techStack,
-    githubUrl,
-    liveUrl,
-    featured,
-    ${imageFragment}
-  }
-`);
-
 export const queryRssFeedData = defineQuery(`
   *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(publishedAt desc, _createdAt desc) {
     _id,
@@ -422,7 +480,7 @@ export const queryAllBlogSlugsAndTitles = defineQuery(`
 `);
 
 export const queryAuthorProfile = defineQuery(`
-  *[_type == "author"][0]{
+  *[_type == "author" && (_id in ["author", "author-ajinkya"])][0]{
     _id,
     name,
     position,
@@ -434,5 +492,3 @@ export const queryAuthorProfile = defineQuery(`
     ${imageFragment}
   }
 `);
-
-

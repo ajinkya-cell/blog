@@ -4,7 +4,6 @@ import {
   Cog,
   File,
   FileText,
-  FolderGit2,
   House,
   type LucideIcon,
   PanelBottom,
@@ -18,7 +17,6 @@ import type {
   StructureResolverContext,
 } from "sanity/structure";
 
-import { createSlugBasedStructure } from "@/components/nested-pages-structure";
 import type { SchemaType, SingletonType } from "@/schemaTypes/index";
 import { getTitleCase } from "@/utils/helper";
 
@@ -105,21 +103,19 @@ export const structure = (
     .items([
       createSingleTon({ S, type: "homePage", icon: House }),
       S.divider(),
-      createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
         S,
         index: { type: "blogIndex", icon: BookMarked },
         list: { type: "blog", title: "Blogs", icon: FileText },
         context,
       }),
-      orderableDocumentListDeskItem({
-        type: "project",
+      createSingleTon({
         S,
-        context,
-        icon: FolderGit2,
-        title: "Projects",
+        type: "author",
+        title: "Author Profile",
+        icon: User,
       }),
-      createList({ S, type: "author", title: "Authors", icon: User }),
+      createList({ S, type: "page", title: "Pages", icon: File }),
       createList({
         S,
         type: "redirect",

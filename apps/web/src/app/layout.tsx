@@ -1,4 +1,5 @@
 import "@workspace/ui/globals.css";
+import "katex/dist/katex.min.css";
 
 import { Analytics } from "@vercel/analytics/next";
 import {
@@ -6,7 +7,7 @@ import {
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Instrument_Serif, Inter } from "next/font/google";
 import { draftMode } from "next/headers";
 import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
@@ -18,11 +19,10 @@ import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
-import { StickyFooter } from "@/components/sticky-footer";
 import { VisualEditingLayer } from "@/components/visual-editing-layer";
 import { getNavigationData } from "@/lib/navigation";
 
-const fontSans = Geist({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -30,6 +30,13 @@ const fontSans = Geist({
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+});
+
+const fontInstrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
 });
 
 export default async function RootLayout({
@@ -42,43 +49,30 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontInstrumentSerif.variable} font-sans antialiased`}
       >
-        {/* No-JS fallback: the footer is revealed by a JS-set --footer-height,
-            so with JS off drop it into normal flow. Images render their own
-            plain <img> in a per-image noscript (SanityImage); hide the lib's
-            LQIP placeholder here so it doesn't stack under that fallback. */}
+        {/* LQIP placeholder fallback */}
         <noscript>
           <style>{`
-            .footer-pinned { position: static !important; height: auto !important; }
-            .footer-pinned::before, .footer-pinned::after { display: none !important; }
             img[data-lqip] { display: none !important; }
           `}</style>
         </noscript>
         <Providers>
           <ScrollToTop />
-          <div
-            className="relative"
-            id="page-shell"
-            style={{ marginBottom: "var(--footer-height)" }}
-          >
+          <div className="relative flex min-h-dvh flex-col bg-background">
             {/* Session-gated, not environment-gated, so the deployed Studio can
                 edit the nav; the published fallback keeps real content in the
                 static shell. */}
             <Suspense fallback={<PublishedNavbar />}>
               <DynamicNavbar />
             </Suspense>
-            <div className="relative z-10 min-h-dvh bg-background pt-16 lg:-mt-16">
-              {children}
-            </div>
-          </div>
-          <StickyFooter>
+            <main className="flex-1 pt-20 sm:pt-24">{children}</main>
             <Suspense
               fallback={<CachedFooter perspective="published" stega={false} />}
             >
               <DynamicFooter />
             </Suspense>
-          </StickyFooter>
+          </div>
           {/* Reads draftMode(), so it must stay behind Suspense — otherwise the
               whole layout opts out of prerendering for every visitor. */}
           <Suspense fallback={null}>
@@ -137,7 +131,5 @@ async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
     stega,
   });
 
-  return (
-    <Navbar navbarData={navbarData} settingsData={settingsData} />
-  );
+  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
 }

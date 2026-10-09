@@ -28,6 +28,7 @@
     "@workspace/logger": "workspace:*",
     "@workspace/tailwind-config": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "katex": "^0.19.0",
     "lucide-react": "catalog:",
     "next-sanity": "13.3.4",
     "next-themes": "catalog:",
@@ -37,6 +38,7 @@
     "slugify": "^1.6.9"
   },
   "devDependencies": {
+    "@types/katex": "^0.16.8",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -69,6 +71,10 @@
     "./internal/sanity-icon": "./src/internal/sanity-icon.tsx",
     "./internal/sanity-rich-text": "./src/internal/sanity-rich-text.ts",
     "./internal/schema-fields": "./src/internal/schema-fields.ts",
+    "./internal/code-group-block": "./src/internal/code-group-block.tsx",
+    "./internal/video-embed-url": "./src/internal/video-embed-url.ts",
+    "./internal/playground-embed-url": "./src/internal/playground-embed-url.ts",
+    "./internal/tweet-embed": "./src/internal/tweet-embed.tsx",
     "./internal/use-copy": "./src/internal/use-copy.ts",
     "./internal/use-disclosure-animation": "./src/internal/use-disclosure-animation.ts"
   }

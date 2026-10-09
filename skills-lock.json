@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "hairline-create": {
+      "source": "lucasmarkes/hairline",
+      "sourceType": "github",
+      "skillPath": "skills/hairline-create/SKILL.md",
+      "computedHash": "7668399290652b2382d3ded47757704e836a37ff4fd3afc4c73f19be2aae2db2"
+    },
     "next-best-practices": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",
