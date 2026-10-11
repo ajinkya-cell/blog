@@ -30,7 +30,7 @@ export function PostNavigation({
       {/* Previous Button: Minimal pill expanding smoothly on hover */}
       {previous?.slug ? (
         <Link
-          className="group relative inline-flex h-10 max-w-[110px] items-center gap-2 overflow-hidden whitespace-nowrap rounded-full border border-border/40 bg-card/40 px-3.5 font-mono text-muted-foreground text-xs shadow-sm transition-all duration-300 ease-out hover:max-w-[340px] hover:border-foreground/30 hover:bg-card hover:text-foreground hover:shadow-md sm:max-w-[120px] sm:hover:max-w-[420px]"
+          className="group relative inline-flex h-10 max-w-[110px] items-center gap-2 overflow-hidden whitespace-nowrap rounded-full border border-border/40 bg-card/40 px-3.5 text-muted-foreground text-xs shadow-sm transition-all duration-300 ease-out hover:max-w-[340px] hover:border-foreground/30 hover:bg-card hover:text-foreground hover:shadow-md sm:max-w-[120px] sm:hover:max-w-[420px]"
           href={previous.slug}
         >
           <ArrowLeft className="size-3.5 shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5" />
@@ -50,7 +50,7 @@ export function PostNavigation({
       {/* Next Button: Minimal pill expanding smoothly on hover */}
       {next?.slug ? (
         <Link
-          className="group relative ml-auto inline-flex h-10 max-w-[95px] items-center justify-end gap-2 overflow-hidden whitespace-nowrap rounded-full border border-border/40 bg-card/40 px-3.5 font-mono text-muted-foreground text-xs shadow-sm transition-all duration-300 ease-out hover:max-w-[340px] hover:border-foreground/30 hover:bg-card hover:text-foreground hover:shadow-md sm:max-w-[105px] sm:hover:max-w-[420px]"
+          className="group relative ml-auto inline-flex h-10 max-w-[95px] items-center justify-end gap-2 overflow-hidden whitespace-nowrap rounded-full border border-border/40 bg-card/40 px-3.5 text-muted-foreground text-xs shadow-sm transition-all duration-300 ease-out hover:max-w-[340px] hover:border-foreground/30 hover:bg-card hover:text-foreground hover:shadow-md sm:max-w-[105px] sm:hover:max-w-[420px]"
           href={next.slug}
         >
           {next.title ? (

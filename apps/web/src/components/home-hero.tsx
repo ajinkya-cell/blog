@@ -32,7 +32,7 @@ export function HomeHero({
       <div className="container max-w-4xl">
         <div className="flex flex-col gap-6 max-w-3xl">
           {statusPill ? (
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 font-medium font-mono text-emerald-600 dark:text-emerald-400 text-xs shadow-[inset_0_1px_2px_rgba(16,185,129,0.15)]">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 font-medium text-emerald-600 dark:text-emerald-400 text-xs shadow-[inset_0_1px_2px_rgba(16,185,129,0.15)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />

@@ -41,7 +41,7 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
   }
 
   return (
-    <span className="rounded border border-foreground/10 bg-foreground/[0.03] px-2 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+    <span className="rounded border border-foreground/10 bg-foreground/[0.03] px-2 py-0.5 text-[10px] text-muted-foreground uppercase tracking-wider">
       {label}
     </span>
   );
@@ -57,7 +57,7 @@ function BlogMeta({
   readTime?: number | null;
 }>) {
   return (
-    <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
+    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
       <BlogCategoryTag category={category} />
       <BlogDate publishedAt={publishedAt} />
       {readTime ? <span>· {readTime} min read</span> : null}
@@ -72,7 +72,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
   return (
     <article className="site-chassis group relative grid grid-cols-1 overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-6 p-6 sm:p-8">
-        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2.5 py-0.5 font-mono text-[10px] text-foreground/80">
+        <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2.5 py-0.5 text-[10px] text-foreground/80">
           <span className="size-1.5 rounded-full bg-foreground/60" />
           <span>Featured Essay</span>
         </div>
@@ -151,7 +151,7 @@ export function BlogCard({ blog }: BlogCardProps) {
         {/* Card body */}
         <div className="relative flex flex-1 flex-col justify-between p-5 pt-4 pb-7 sm:p-6 sm:pt-4 sm:pb-8">
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <BlogDate className="text-[11px]" publishedAt={publishedAt} />
               {publishedAt && readTime ? (
                 <span aria-hidden="true">·</span>

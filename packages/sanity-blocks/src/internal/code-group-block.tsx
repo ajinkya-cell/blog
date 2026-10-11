@@ -1,8 +1,12 @@
 "use client";
 
 import { cn } from "@workspace/tailwind-config/utils";
-import { useState } from "react";
-import { CodeBlock, type CodeBlockValue } from "./code-block";
+import { type KeyboardEvent, useId, useRef, useState } from "react";
+
+import type { CodeBlockValue } from "./code-block";
+import { splitCodeLines } from "./code-lines";
+import { CodeBody, CodeWindow, LineCount } from "./code-window";
+import { CopyButton } from "./copy-button";
 
 export interface CodeGroupFile extends CodeBlockValue {
   _key?: string;
@@ -18,6 +22,8 @@ export function CodeGroupBlock({
   files,
 }: Readonly<CodeGroupBlockProps>) {
   const [activeTab, setActiveTab] = useState(0);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const idPrefix = useId();
 
   if (!files || files.length === 0) {
     return null;
@@ -26,52 +32,97 @@ export function CodeGroupBlock({
   const validIndex = Math.min(activeTab, files.length - 1);
   const activeFile = files[validIndex];
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    let next = -1;
+    if (event.key === "ArrowRight") {
+      next = (validIndex + 1) % files.length;
+    } else if (event.key === "ArrowLeft") {
+      next = (validIndex - 1 + files.length) % files.length;
+    } else if (event.key === "Home") {
+      next = 0;
+    } else if (event.key === "End") {
+      next = files.length - 1;
+    }
+    if (next === -1) {
+      return;
+    }
+    event.preventDefault();
+    setActiveTab(next);
+    tabRefs.current[next]?.focus();
+  };
+
   return (
-    <div className="site-chassis not-prose relative my-6 overflow-hidden rounded-2xl">
-      {title && (
-        <div className="border-border/40 border-b bg-foreground/[0.02] px-4 py-2 font-mono text-muted-foreground text-xs uppercase tracking-wider">
-          {title}
-        </div>
-      )}
-      <div className="p-2 pb-0">
+    <CodeWindow
+      end={
+        <>
+          {title ? (
+            <span className="hidden max-w-48 truncate text-muted-foreground text-xs md:inline">
+              {title}
+            </span>
+          ) : null}
+          {activeFile?.code ? (
+            <>
+              <LineCount count={splitCodeLines(activeFile.code).length} />
+              <CopyButton code={activeFile.code} />
+            </>
+          ) : null}
+        </>
+      }
+      start={
         <div
-          aria-label="Code tabs"
-          className="recessed-well flex items-center gap-1.5 overflow-x-auto rounded-xl p-1.5"
+          aria-label={title || "Code files"}
+          className="-mb-px flex h-full min-w-0 items-stretch gap-4 overflow-x-auto [scrollbar-width:none]"
+          onKeyDown={handleKeyDown}
           role="tablist"
         >
           {files.map((file, index) => {
             const isSelected = index === validIndex;
-            const label = file.filename || `File ${index + 1}`;
             return (
               <button
-                key={file._key || `${file.filename}-${index}`}
+                aria-controls={`${idPrefix}-panel`}
                 aria-selected={isSelected}
                 className={cn(
-                  "shrink-0 rounded-lg px-3 py-1 font-mono text-xs transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                  "focus-ring relative flex shrink-0 items-center font-mono text-xs transition-colors",
                   isSelected
-                    ? "popout-btn-active font-semibold shadow-sm"
-                    : "popout-btn-inactive text-muted-foreground hover:text-foreground"
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground hover:text-foreground/80"
                 )}
+                id={`${idPrefix}-tab-${index}`}
+                key={file._key || `${file.filename}-${index}`}
                 onClick={() => setActiveTab(index)}
+                ref={(element) => {
+                  tabRefs.current[index] = element;
+                }}
                 role="tab"
+                tabIndex={isSelected ? 0 : -1}
                 type="button"
               >
-                {label}
+                {file.filename || `File ${index + 1}`}
+                {isSelected ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-foreground"
+                  />
+                ) : null}
               </button>
             );
           })}
         </div>
-      </div>
-      {activeFile && (
-        <div className="[&>figure]:my-0 [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:shadow-none">
-          <CodeBlock
+      }
+    >
+      <div
+        aria-labelledby={`${idPrefix}-tab-${validIndex}`}
+        id={`${idPrefix}-panel`}
+        role="tabpanel"
+      >
+        {activeFile?.code ? (
+          <CodeBody
             code={activeFile.code}
-            filename={undefined}
             highlightLines={activeFile.highlightLines}
             language={activeFile.language}
           />
-        </div>
-      )}
-    </div>
+        ) : null}
+      </div>
+    </CodeWindow>
   );
 }

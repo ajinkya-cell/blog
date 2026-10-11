@@ -27,7 +27,7 @@ export function RelatedPosts({ posts }: Readonly<RelatedPostsProps>) {
     >
       <div className="flex items-center gap-3">
         <h2
-          className="font-mono text-muted-foreground text-xs uppercase tracking-wider"
+          className="text-muted-foreground text-xs uppercase tracking-wider"
           id="related-writing-heading"
         >
           Related Writing

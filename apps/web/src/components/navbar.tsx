@@ -149,7 +149,7 @@ export function Navbar({ navbarData, settingsData }: Readonly<NavigationData>) {
               >
                 <Search className="size-3.5" />
                 <span className="hidden text-xs lg:inline">Search</span>
-                <kbd className="hidden items-center gap-0.5 rounded border border-border bg-muted/60 px-1 font-mono text-[9px] text-muted-foreground lg:inline-flex">
+                <kbd className="hidden items-center gap-0.5 rounded border border-border bg-muted/60 px-1 text-[9px] text-muted-foreground lg:inline-flex">
                   ⌘K
                 </kbd>
               </button>

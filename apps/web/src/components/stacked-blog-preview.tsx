@@ -14,7 +14,9 @@ function easeOutCubic(x: number): number {
   return 1 - Math.pow(1 - x, 3);
 }
 
-export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>) {
+export function StackedBlogPreview({
+  blogs,
+}: Readonly<StackedBlogPreviewProps>) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
@@ -22,6 +24,17 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
 
   const [progress, setProgress] = useState(0);
   const [windowWidth, setWindowWidth] = useState(1200);
+  // The back cards render flat behind the front card, then tilt out once
+  // after first paint — the "about to come out" moment.
+  const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    // Two frames so the flat pose is painted before the transition starts.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setSettled(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     function handleResize() {
@@ -62,12 +75,21 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
         if (e.deltaY > 0 && !isFullyRevealed) {
           e.preventDefault();
           const step = Math.min(Math.max(e.deltaY * 0.0018, 0.04), 0.22);
-          targetProgressRef.current = Math.min(1, targetProgressRef.current + step);
+          targetProgressRef.current = Math.min(
+            1,
+            targetProgressRef.current + step
+          );
           startAnimation();
         } else if (e.deltaY < 0 && targetProgressRef.current > 0) {
           e.preventDefault();
-          const step = Math.min(Math.max(Math.abs(e.deltaY) * 0.0018, 0.04), 0.22);
-          targetProgressRef.current = Math.max(0, targetProgressRef.current - step);
+          const step = Math.min(
+            Math.max(Math.abs(e.deltaY) * 0.0018, 0.04),
+            0.22
+          );
+          targetProgressRef.current = Math.max(
+            0,
+            targetProgressRef.current - step
+          );
           startAnimation();
         }
       }
@@ -127,11 +149,20 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
           !isFullyRevealed
         ) {
           e.preventDefault();
-          targetProgressRef.current = Math.min(1, targetProgressRef.current + 0.34);
+          targetProgressRef.current = Math.min(
+            1,
+            targetProgressRef.current + 0.34
+          );
           startAnimation();
-        } else if (["ArrowUp", "PageUp"].includes(e.key) && targetProgressRef.current > 0) {
+        } else if (
+          ["ArrowUp", "PageUp"].includes(e.key) &&
+          targetProgressRef.current > 0
+        ) {
           e.preventDefault();
-          targetProgressRef.current = Math.max(0, targetProgressRef.current - 0.34);
+          targetProgressRef.current = Math.max(
+            0,
+            targetProgressRef.current - 0.34
+          );
           startAnimation();
         }
       }
@@ -182,6 +213,57 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
   const spreadX = isDesktop ? 395 : isTablet ? 320 : 0;
   // Vertical spread offset for mobile
   const spreadY = isDesktop || isTablet ? 0 : 210;
+  // Resting pose of the back cards: held like a hand of cards, tilted from
+  // their bottom edge so only the top corners fan out past the front card.
+  // Every value eases to neutral (0 / 1) as the cards come out.
+  const isNarrow = !(isDesktop || isTablet);
+  const rest = {
+    card1: {
+      tilt: isNarrow ? -3 : -4,
+      lift: 9,
+      scale: 0.97,
+      brightness: 0.86,
+    },
+    card2: {
+      tilt: isNarrow ? 3.5 : 5,
+      lift: 16,
+      scale: 0.94,
+      brightness: 0.74,
+    },
+  };
+  // Before the entrance settles the cards sit flat and hidden behind card 0.
+  const pose = settled ? 1 : 0;
+  // The tilt resolves a little ahead of the slide, so cards land flat.
+  const unTilt = easeOutCubic(Math.min(1, progress * 1.25));
+  // The slivers are too thin to hover meaningfully, so the back cards only
+  // become interactive once they've fanned out.
+  const backPointerEvents = eased < 0.5 ? "none" : "auto";
+  // The CSS transition only carries the entrance; once scrolling starts the
+  // rAF loop drives every frame and a transition would make it lag.
+  const entranceTransition = (delay: number) =>
+    progress === 0
+      ? `transform 700ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms, filter 700ms ease-out ${delay}ms`
+      : "none";
+
+  function backCardStyle(
+    card: (typeof rest)["card1"],
+    x: number,
+    y: number,
+    zIndex: number,
+    delay: number
+  ) {
+    const atRest = pose * (1 - eased);
+    const tilt = card.tilt * pose * (1 - unTilt);
+    const scale = 1 - (1 - card.scale) * atRest;
+    const brightness = 1 - (1 - card.brightness) * atRest;
+    return {
+      transform: `translate3d(${x}px, ${y - card.lift * atRest}px, 0px) rotate(${tilt}deg) scale(${scale})`,
+      filter: `brightness(${brightness})`,
+      transition: entranceTransition(delay),
+      zIndex,
+      pointerEvents: backPointerEvents,
+    } as const;
+  }
 
   // Card 0 (Center/Front)
   const card0Style = {
@@ -191,42 +273,26 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
   };
 
   // Card 1 (Left Card - comes from behind to the left)
-  const card1X = isDesktop || isTablet
-    ? -eased * spreadX
-    : -eased * 16;
-  const card1Y = isDesktop || isTablet
-    ? -12 * (1 - eased)
-    : eased * spreadY;
-  const card1Scale = 0.94 + eased * 0.06;
-  const card1Rotate = -2.5 * (1 - eased);
-  const card1Opacity = 0.85 + eased * 0.15;
-
-  const card1Style = {
-    transform: `translate3d(${card1X}px, ${card1Y}px, 0px) scale(${card1Scale}) rotate(${card1Rotate}deg)`,
-    zIndex: 20,
-    opacity: card1Opacity,
-  };
+  const card1Style = backCardStyle(
+    rest.card1,
+    isNarrow ? -eased * 16 : -eased * spreadX,
+    eased * spreadY,
+    20,
+    0
+  );
 
   // Card 2 (Right Card - comes from behind to the right)
-  const card2X = isDesktop || isTablet
-    ? eased * spreadX
-    : eased * 16;
-  const card2Y = isDesktop || isTablet
-    ? -24 * (1 - eased)
-    : eased * (spreadY * 2);
-  const card2Scale = 0.88 + eased * 0.12;
-  const card2Rotate = 2.5 * (1 - eased);
-  const card2Opacity = 0.7 + eased * 0.3;
-
-  const card2Style = {
-    transform: `translate3d(${card2X}px, ${card2Y}px, 0px) scale(${card2Scale}) rotate(${card2Rotate}deg)`,
-    zIndex: 10,
-    opacity: card2Opacity,
-  };
+  const card2Style = backCardStyle(
+    rest.card2,
+    isNarrow ? eased * 16 : eased * spreadX,
+    eased * (spreadY * 2),
+    10,
+    120
+  );
 
   return (
     <section
-      className="relative flex min-h-[calc(100dvh-5.5rem)] w-full flex-col items-center justify-between overflow-hidden px-4 pt-6 pb-12 sm:pt-8 sm:pb-16"
+      className="relative flex min-h-[calc(100dvh-5.5rem)] w-full flex-col items-center justify-between overflow-hidden px-4 pt-6 pb-6 sm:pt-8 sm:pb-8"
       ref={containerRef}
     >
       {/* Headline positioned cleanly at the top */}
@@ -250,33 +316,37 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
           minHeight: isDesktop || isTablet ? "480px" : `${460 + eased * 420}px`,
         }}
       >
-        {/* Card 1 (Left in final state, stacked behind in start state) */}
-        <div
-          className="absolute w-[310px] sm:w-[350px] md:w-[370px] origin-center transition-shadow duration-300 will-change-transform"
-          style={card1Style}
-        >
-          <div className="rounded-2xl shadow-xl transition-transform hover:-translate-y-1">
-            <BlogCard blog={blog1} />
+        {/* All three cards share this box's top edge, so the back cards'
+            peek doesn't depend on how tall each card's content is. */}
+        <div className="relative w-[310px] sm:w-[350px] md:w-[370px]">
+          {/* Card 1 (Left in final state, stacked behind in start state) */}
+          <div
+            className="absolute inset-x-0 top-0 origin-bottom will-change-transform motion-reduce:transition-none!"
+            style={card1Style}
+          >
+            <div className="rounded-2xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-1">
+              <BlogCard blog={blog1} />
+            </div>
           </div>
-        </div>
 
-        {/* Card 2 (Right in final state, stacked behind in start state) */}
-        <div
-          className="absolute w-[310px] sm:w-[350px] md:w-[370px] origin-center transition-shadow duration-300 will-change-transform"
-          style={card2Style}
-        >
-          <div className="rounded-2xl shadow-xl transition-transform hover:-translate-y-1">
-            <BlogCard blog={blog2} />
+          {/* Card 2 (Right in final state, stacked behind in start state) */}
+          <div
+            className="absolute inset-x-0 top-0 origin-bottom will-change-transform motion-reduce:transition-none!"
+            style={card2Style}
+          >
+            <div className="rounded-2xl bg-background shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-1">
+              <BlogCard blog={blog2} />
+            </div>
           </div>
-        </div>
 
-        {/* Card 0 (Center - in front at start state) */}
-        <div
-          className="absolute w-[310px] sm:w-[350px] md:w-[370px] origin-center transition-shadow duration-300 will-change-transform"
-          style={card0Style}
-        >
-          <div className="rounded-2xl shadow-2xl transition-transform hover:-translate-y-1 ring-1 ring-border/50">
-            <BlogCard blog={blog0} />
+          {/* Card 0 (Center - in front at start state) */}
+          <div
+            className="relative origin-center transition-shadow duration-300 will-change-transform"
+            style={card0Style}
+          >
+            <div className="rounded-2xl bg-background shadow-2xl transition-transform hover:-translate-y-1 ring-1 ring-border/50">
+              <BlogCard blog={blog0} />
+            </div>
           </div>
         </div>
       </div>
@@ -284,7 +354,7 @@ export function StackedBlogPreview({ blogs }: Readonly<StackedBlogPreviewProps>)
       {/* Explore all link button below cards */}
       <div className="relative z-40 mt-8 sm:mt-10">
         <Link
-          className="group inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/80 px-4 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm transition-all hover:border-[#7577E6]/40 hover:text-foreground hover:shadow-sm"
+          className="group inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/80 px-4 py-2 text-xs text-muted-foreground backdrop-blur-sm transition-all hover:border-[#7577E6]/40 hover:text-foreground hover:shadow-sm"
           href="/blog"
         >
           <span>View all articles</span>

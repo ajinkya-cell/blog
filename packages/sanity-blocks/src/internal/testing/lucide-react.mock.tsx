@@ -51,6 +51,7 @@ export const Tag = IconStub("tag");
 export const Rss = IconStub("rss");
 export const Bookmark = IconStub("bookmark");
 export const Minus = IconStub("minus");
+export const BookOpen = IconStub("book-open");
 export const Download = IconStub("download");
 export const Sigma = IconStub("sigma");
 export const Layers = IconStub("layers");

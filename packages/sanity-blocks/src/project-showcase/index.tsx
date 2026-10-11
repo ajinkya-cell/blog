@@ -38,7 +38,7 @@ function StatusBadge({ status }: Readonly<{ status?: string | null }>) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider",
+        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] uppercase tracking-wider",
         isWip && "bg-amber-500/10 text-amber-600 dark:text-amber-400",
         isArchived && "bg-zinc-500/10 text-zinc-500",
         !isWip &&
@@ -82,7 +82,7 @@ function ProjectCard({ project }: Readonly<{ project: ProjectItemData }>) {
       )}
     >
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3 text-muted-foreground text-xs font-mono">
+        <div className="flex items-center justify-between gap-3 text-muted-foreground text-xs">
           <div className="flex items-center gap-2">
             {category && <span>{category}</span>}
             {category && year && <span>•</span>}
@@ -132,7 +132,7 @@ function ProjectCard({ project }: Readonly<{ project: ProjectItemData }>) {
           <div className="flex flex-wrap gap-1.5 pt-2">
             {tags.map((tag) => (
               <span
-                className="rounded border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-muted-foreground"
+                className="rounded border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] text-muted-foreground"
                 key={tag}
               >
                 {tag}
@@ -147,7 +147,7 @@ function ProjectCard({ project }: Readonly<{ project: ProjectItemData }>) {
           {githubUrl && (
             <a
               aria-label={`${title} on GitHub`}
-              className="focus-ring inline-flex items-center gap-1.5 font-mono text-muted-foreground hover:text-foreground"
+              className="focus-ring inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
               href={githubUrl}
               rel="noopener noreferrer"
               target="_blank"
@@ -158,7 +158,7 @@ function ProjectCard({ project }: Readonly<{ project: ProjectItemData }>) {
           )}
           {liveUrl && (
             <a
-              className="focus-ring inline-flex items-center gap-1 font-mono text-muted-foreground hover:text-foreground"
+              className="focus-ring inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
               href={liveUrl}
               rel="noopener noreferrer"
               target="_blank"
@@ -208,7 +208,7 @@ export function ProjectShowcase({
           </div>
           {viewAllHref && (
             <Link
-              className="focus-ring inline-flex items-center gap-1 text-sm font-mono text-muted-foreground hover:text-foreground w-fit"
+              className="focus-ring inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground w-fit"
               href={viewAllHref}
             >
               <span>View all projects</span>

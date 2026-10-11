@@ -18,20 +18,20 @@ import {
   SWAP_SHOWN,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
-import {
-  DISCLOSURE_ANIMATION_MS,
-  useDisclosureAnimation,
-} from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
-import { Check, ChevronDown, ChevronRight, ListTree } from "lucide-react";
+import { Check, ChevronRight, ChevronUp, ListTree } from "lucide-react";
 import {
   type FC,
+  type FocusEvent,
   type MouseEvent,
+  type PointerEvent,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
+import { RulerScrollArea } from "@/components/elements/ruler-scroll-area";
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 
 type TableOfContentProps = {
@@ -58,10 +58,10 @@ type AnchorProps = {
   readonly activeSlug: string | null;
   readonly maxDepth?: number;
   readonly currentDepth?: number;
-  // Namespaces the anchor's own DOM id so the desktop and mobile trees can both
+  // Namespaces the anchor's own DOM id so the inline and floating trees can both
   // render without producing duplicate ids.
   readonly idPrefix?: string;
-  // Fires after a heading link activates, letting the mobile disclosure close.
+  // Fires after a heading link activates, letting the floating panel close.
   readonly onNavigate?: () => void;
 };
 
@@ -106,8 +106,6 @@ const READING_LINE_SLACK = 2;
 
 const DEFAULT_MAX_DEPTH = 6;
 const MIN_HEADINGS_TO_SHOW = 1;
-// Close animation duration plus a settle frame — scrolling waits this long.
-const DISCLOSURE_CLOSE_MS = DISCLOSURE_ANIMATION_MS + 20;
 
 function isValidHeadingStyle(style: unknown): style is HeadingStyle {
   return typeof style === "string" && style in HEADING_STYLES;
@@ -314,18 +312,23 @@ function processHeadingBlocks(
   }
 }
 
-function flattenSlugs(headings: ProcessedHeading[]): string[] {
-  const result: string[] = [];
+type FlatHeading = { readonly slug: string; readonly text: string };
+
+function flattenHeadings(headings: ProcessedHeading[]): FlatHeading[] {
+  const result: FlatHeading[] = [];
   const walk = (items: ProcessedHeading[]) => {
     for (const item of items) {
-      result.push(item.href.replace(/^#/, ""));
+      const slug = item.href.replace(/^#/, "");
+      if (slug) {
+        result.push({ slug, text: item.text });
+      }
       if (item.children.length > 0) {
         walk(item.children);
       }
     }
   };
   walk(headings);
-  return result.filter(Boolean);
+  return result;
 }
 
 function useTableOfContentState(
@@ -485,18 +488,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
     }
     event.preventDefault();
     window.history.pushState(null, "", href);
-    if (onNavigate) {
-      // Mobile: collapse the disclosure first, then scroll once its close
-      // animation has settled. Scrolling immediately overshoots — the TOC
-      // above the target shrinks mid-scroll, pulling the heading up and past
-      // the viewport top.
-      onNavigate();
-      window.setTimeout(
-        () => target.scrollIntoView({ behavior: "smooth" }),
-        DISCLOSURE_CLOSE_MS
-      );
-      return;
-    }
+    onNavigate?.();
     target.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -672,7 +664,7 @@ function ShareOptions({
             )}
           />
         </span>
-        <span aria-hidden="true" className="font-mono text-[10px]">
+        <span aria-hidden="true" className="text-[10px]">
           {copied ? "Copied" : "Copy"}
         </span>
         <output className="sr-only">
@@ -696,7 +688,9 @@ export const TableOfContent: FC<TableOfContentProps> = ({
     maxDepth
   );
 
-  const slugKey = flattenSlugs(headings).join("|");
+  const slugKey = flattenHeadings(headings)
+    .map((heading) => heading.slug)
+    .join("|");
   const activeSlug = useActiveHeading(slugKey);
 
   if (error || !shouldShow || headings.length === 0) {
@@ -714,13 +708,13 @@ export const TableOfContent: FC<TableOfContentProps> = ({
       {/* Header */}
       <div className="flex items-center gap-2 border-border/40 border-b bg-foreground/[0.02] px-4 py-3">
         <ListTree className="size-3.5 text-muted-foreground" />
-        <span className="font-mono font-semibold text-[11px] text-muted-foreground tracking-wider uppercase">
+        <span className="font-semibold text-[11px] text-muted-foreground tracking-wider uppercase">
           On This Page
         </span>
       </div>
 
       {/* Links List */}
-      <div className="max-h-[60vh] space-y-1 overflow-y-auto p-2">
+      <RulerScrollArea className="max-h-[60vh] space-y-1 p-2">
         <ul className="flex flex-col gap-1">
           {headings.map((heading, index) => (
             <TableOfContentAnchor
@@ -732,7 +726,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
             />
           ))}
         </ul>
-      </div>
+      </RulerScrollArea>
 
       {/* Share Tray */}
       <div className="border-border/40 border-t p-2">
@@ -742,88 +736,174 @@ export const TableOfContent: FC<TableOfContentProps> = ({
   );
 };
 
-export const CollapsibleTableOfContent: FC<TableOfContentProps> = ({
-  richText,
-  className,
-  maxDepth = DEFAULT_MAX_DEPTH,
-  shareTitle,
-  shareUrl,
-}) => {
+// Grace period before a mouse-out closes the floating panel, so crossing the
+// gap between the pill and the panel doesn't collapse it.
+const HOVER_CLOSE_DELAY_MS = 150;
+
+export const FloatingTableOfContent: FC<
+  Omit<TableOfContentProps, "shareTitle" | "shareUrl">
+> = ({ richText, className, maxDepth = DEFAULT_MAX_DEPTH }) => {
   const { shouldShow, headings, error } = useTableOfContentState(
     richText,
     maxDepth
   );
 
-  const slugKey = flattenSlugs(headings).join("|");
+  const flatHeadings = flattenHeadings(headings);
+  const slugKey = flatHeadings.map((heading) => heading.slug).join("|");
   const activeSlug = useActiveHeading(slugKey);
   const [open, setOpen] = useState(false);
-  const { detailsRef, contentRef } = useDisclosureAnimation(open);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef(0);
+  const lastPointerRef = useRef("mouse");
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const handlePointerDown = (event: globalThis.PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
 
   if (error || !shouldShow || headings.length === 0) {
     return null;
   }
 
-  const handleSummaryClick = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault();
+  const activeIndex = flatHeadings.findIndex(
+    (heading) => heading.slug === activeSlug
+  );
+  const activeHeading = flatHeadings[Math.max(activeIndex, 0)];
+  const position = activeIndex === -1 ? 0 : activeIndex + 1;
+
+  // Hover expands only for a real mouse — touch fires pointerenter on tap,
+  // which would race the tap's own toggle below.
+  const handlePointerEnter = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+    window.clearTimeout(closeTimerRef.current);
+    setOpen(true);
+  };
+  const handlePointerLeave = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+    window.clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = window.setTimeout(
+      () => setOpen(false),
+      HOVER_CLOSE_DELAY_MS
+    );
+  };
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setOpen(false);
+    }
+  };
+  // A mouse click lands on a panel that hover already opened, so it must not
+  // toggle it shut; taps and keyboard activation (detail 0) toggle.
+  const handlePillClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (lastPointerRef.current === "mouse" && event.detail > 0) {
+      setOpen(true);
+      return;
+    }
     setOpen((current) => !current);
   };
 
   return (
-    <details
+    <div
       className={cn(
-        "site-chassis relative w-full overflow-hidden rounded-2xl border border-border/40 font-sans transition-all",
+        "fixed right-4 bottom-4 z-40 font-sans sm:right-6 sm:bottom-6",
         className
       )}
-      open={open}
-      ref={detailsRef}
+      onBlur={handleBlur}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      ref={containerRef}
     >
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
-      <summary
-        className="flex cursor-pointer list-none items-center justify-between gap-2 bg-foreground/[0.02] px-4 py-3 font-mono font-semibold text-[11px] text-muted-foreground tracking-wider uppercase transition-colors hover:bg-foreground/[0.04] hover:text-foreground [&::-webkit-details-marker]:hidden"
-        onClick={handleSummaryClick}
+      <nav
+        aria-label="Table of contents"
+        className={cn(
+          "site-chassis absolute right-0 bottom-full mb-3 w-80 max-w-[calc(100vw-2rem)] origin-bottom-right select-none overflow-hidden rounded-2xl transition-[opacity,transform,visibility] duration-200 ease-out motion-reduce:transition-none",
+          open
+            ? "visible translate-y-0 scale-100 opacity-100"
+            : "invisible translate-y-2 scale-95 opacity-0"
+        )}
+        id="floating-toc-panel"
+        inert={!open}
       >
-        <div className="flex items-center gap-2">
+        {/* Header */}
+        <div className="flex items-center gap-2 border-border/40 border-b bg-foreground/[0.02] px-4 py-3">
           <ListTree className="size-3.5 text-muted-foreground" />
-          <span>Table of Contents</span>
-          <span className="font-mono text-[10px] text-muted-foreground/60">
-            ({headings.length})
+          <span className="font-medium text-muted-foreground text-xs">
+            On this page
+          </span>
+          <span className="ml-auto text-[11px] text-muted-foreground/70 tabular-nums">
+            {position}/{flatHeadings.length}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] text-muted-foreground/70 lowercase">
-            {open ? "collapse" : "expand"}
-          </span>
-          <ChevronDown
-            aria-hidden="true"
-            className={cn(
-              "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-              open && "rotate-180"
-            )}
-          />
-        </div>
-      </summary>
-      <div className="border-border/40 border-t overflow-hidden" ref={contentRef}>
-        <div className="space-y-3 p-3">
-          <ul className="flex flex-col gap-1 max-h-[50vh] overflow-y-auto pr-1">
+
+        {/* Links List */}
+        <RulerScrollArea className="max-h-[min(60vh,28rem)] space-y-1 p-2">
+          <ul className="flex flex-col gap-1">
             {headings.map((heading, index) => (
               <TableOfContentAnchor
                 activeSlug={activeSlug}
                 currentDepth={1}
                 heading={heading}
-                idPrefix="toc-"
+                idPrefix="floating-"
                 key={heading.id || `${heading.text}-${index}`}
                 maxDepth={maxDepth}
                 onNavigate={() => setOpen(false)}
               />
             ))}
           </ul>
-          <div className="border-border/40 border-t pt-2">
-            <ShareOptions shareUrl={shareUrl} title={shareTitle} />
-          </div>
-        </div>
-      </div>
-    </details>
+        </RulerScrollArea>
+      </nav>
+
+      <button
+        aria-controls="floating-toc-panel"
+        aria-expanded={open}
+        aria-label={`Table of contents: ${activeHeading?.text ?? ""}`}
+        className="site-chassis flex h-10 max-w-[min(18rem,calc(100vw-2rem))] cursor-pointer items-center gap-2.5 rounded-full pr-3.5 pl-3 text-xs transition-transform active:scale-95"
+        onClick={handlePillClick}
+        onPointerDown={(event) => {
+          lastPointerRef.current = event.pointerType;
+        }}
+        type="button"
+      >
+        <ListTree
+          aria-hidden="true"
+          className="size-3.5 shrink-0 text-muted-foreground"
+        />
+        <span className="truncate font-medium text-foreground/90">
+          {activeHeading?.text}
+        </span>
+        <span className="shrink-0 text-muted-foreground/70 tabular-nums">
+          {position}/{flatHeadings.length}
+        </span>
+        <ChevronUp
+          aria-hidden="true"
+          className={cn(
+            "size-3.5 shrink-0 text-muted-foreground transition-transform duration-200",
+            open && "rotate-180"
+          )}
+        />
+      </button>
+    </div>
   );
 };
-
-export const MobileTableOfContent = CollapsibleTableOfContent;

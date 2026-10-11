@@ -38,6 +38,8 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "rough-notation": "^0.5.1",
+    "roughjs": "^4.6.6",
     "schema-dts": "^2.0.0"
   },
   "devDependencies": {

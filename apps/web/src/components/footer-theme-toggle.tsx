@@ -35,7 +35,7 @@ export function FooterThemeToggle() {
             aria-label={`Switch to ${label} theme`}
             aria-pressed={active}
             className={cn(
-              "flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-xs transition-all",
+              "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs transition-all",
               active
                 ? "popout-btn-active font-semibold shadow-sm"
                 : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"

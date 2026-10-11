@@ -35,6 +35,7 @@
     "sanity": "catalog:",
     "sanity-image": "^1.2.0",
     "schema-dts": "^2.0.0",
+    "shiki": "^4.5.0",
     "slugify": "^1.6.9"
   },
   "devDependencies": {

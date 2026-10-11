@@ -7,7 +7,7 @@ export function BlockEyebrow({
 
   return (
     <span
-      className="recessed-well inline-flex w-fit items-center self-start justify-self-start rounded-full border border-white/[0.08] px-3 py-1 font-mono text-muted-foreground text-xs uppercase tracking-wider"
+      className="recessed-well inline-flex w-fit items-center self-start justify-self-start rounded-full border border-white/[0.08] px-3 py-1 text-muted-foreground text-xs uppercase tracking-wider"
       data-inline-edit
     >
       {eyebrow}

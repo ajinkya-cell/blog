@@ -47,7 +47,9 @@ export function MatrixRippleBackground() {
     const ripples: Ripple[] = [];
 
     function getRandomChar(): string {
-      return MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)] ?? "0";
+      return (
+        MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)] ?? "0"
+      );
     }
 
     function initGrid() {

@@ -26,9 +26,14 @@
   --muted-foreground: oklch(0.442 0.017 285.786);
   --accent: var(--muted);
   --accent-foreground: var(--foreground);
-  --accent-green: #7577E6;
-  --accent-brand: #7577E6;
+  --accent-green: #7577e6;
+  --accent-brand: #7577e6;
   --accent-green-foreground: #ffffff;
+  /* Callout accents — only the rule, icon and title take the hue; body text
+     stays on --foreground so every type is readable in both themes. */
+  --callout-info: oklch(0.55 0.15 255);
+  --callout-tip: oklch(0.56 0.13 160);
+  --callout-warn: oklch(0.62 0.15 65);
   --success: oklch(0.48 0.16 122);
   --danger: oklch(0.55 0.21 27);
   --destructive: oklch(0.577 0.245 27.325);
@@ -123,6 +128,9 @@
   --accent: var(--card);
   --accent-foreground: var(--foreground);
   --accent-green-foreground: oklch(0.21 0.006 285.885);
+  --callout-info: oklch(0.74 0.12 250);
+  --callout-tip: oklch(0.78 0.13 162);
+  --callout-warn: oklch(0.82 0.13 80);
   /* Lifted for the dark ground — success can just be the accent, danger has to
      climb well above the fill-tuned `--destructive` (L 0.396) to read at all. */
   --success: var(--accent-green);
@@ -158,8 +166,12 @@
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  --font-serif: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-instrument-serif: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif:
+    var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria,
+    "Times New Roman", Times, serif;
+  --font-instrument-serif:
+    var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria,
+    "Times New Roman", Times, serif;
 
   --animate-marquee: marquee 40s linear infinite;
 
@@ -179,6 +191,9 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-green: var(--accent-green);
   --color-accent-green-foreground: var(--accent-green-foreground);
+  --color-callout-info: var(--callout-info);
+  --color-callout-tip: var(--callout-tip);
+  --color-callout-warn: var(--callout-warn);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-destructive: var(--destructive);
@@ -274,6 +289,17 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* ScrollWater's waves are 200 SVG units wide, two periods of 100, so
+   shifting by one period loops seamlessly. */
+@keyframes scroll-water-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100px);
   }
 }
 
@@ -510,6 +536,12 @@
   html {
     background-color: var(--overscroll-top);
     overscroll-behavior: none;
+    /* The web app's ScrollWater circle is the scroll indicator; the page
+       still scrolls, only the native bar is hidden. */
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
   }
   /* iOS paints the strips behind its toolbar and status bar from the document
      background — WebKit takes `body`'s, with the root covering the hairline at
@@ -620,11 +652,24 @@
   min-width: calc(2.5ch + var(--rich-code-inset-inline) * 2);
   line-height: inherit;
   text-align: right;
+  padding-right: 0;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+  color: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
   user-select: none;
-  border-right: 1px solid var(--border);
-  background-color: var(--muted);
+}
+
+/* Shiki emits both themes on every token as custom properties; the `.dark`
+   class picks one, so the theme toggle recolours code without re-highlighting. */
+.rich-code-pre [data-token] {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+}
+
+:is(.dark *) .rich-code-pre [data-token],
+.dark .rich-code-pre [data-token] {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
 }
 
 .rich-code-gutter span {
@@ -789,16 +834,21 @@ html {
 }
 
 .font-instrument-serif {
-  font-family: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family:
+    var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria,
+    "Times New Roman", Times, serif;
 }
 
 .font-serif {
-  font-family: var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family:
+    var(--font-instrument-serif), "Instrument Serif", Georgia, Cambria,
+    "Times New Roman", Times, serif;
 }
 
 /* Footer: oversized outlined wordmark that fades into the page edge */
 .footer-wordmark {
   color: transparent;
-  -webkit-text-stroke: 1px color-mix(in oklab, var(--foreground) 22%, transparent);
+  -webkit-text-stroke: 1px
+    color-mix(in oklab, var(--foreground) 22%, transparent);
   mask-image: linear-gradient(to bottom, black 35%, transparent 95%);
 }

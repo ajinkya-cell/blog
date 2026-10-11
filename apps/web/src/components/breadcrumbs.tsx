@@ -88,7 +88,7 @@ export function Breadcrumbs({
       >
         <div className="container flex min-h-11 items-center gap-2.5 py-2.5">
           <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
-            <ol className="flex min-w-0 items-center gap-1.5 font-mono text-xs text-muted-foreground uppercase tracking-wider">
+            <ol className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-wider">
               {trail.map((crumb, index) => {
                 const isCurrent = index === trail.length - 1;
                 return (

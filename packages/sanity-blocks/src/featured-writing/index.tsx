@@ -78,7 +78,7 @@ export function FeaturedWriting({
           </div>
           {viewAllHref ? (
             <Link
-              className="popout-btn-inactive inline-flex w-fit items-center gap-1.5 rounded-full px-4 py-1.5 font-mono text-foreground/80 text-xs transition-all hover:text-white"
+              className="popout-btn-inactive inline-flex w-fit items-center gap-1.5 rounded-full px-4 py-1.5 text-foreground/80 text-xs transition-all hover:text-white"
               href={viewAllHref}
             >
               <span>All essays</span>
@@ -100,7 +100,7 @@ export function FeaturedWriting({
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="flex items-center gap-2 text-xs">
                     {post.category ? (
-                      <span className="recessed-well rounded-md px-2 py-0.5 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                      <span className="recessed-well rounded-md px-2 py-0.5 text-[10px] text-muted-foreground uppercase tracking-wider">
                         {post.category}
                       </span>
                     ) : null}
@@ -108,7 +108,7 @@ export function FeaturedWriting({
                       <span className="text-muted-foreground/40">•</span>
                     ) : null}
                     {post.readTime ? (
-                      <span className="font-mono text-[11px] text-muted-foreground">
+                      <span className="text-[11px] text-muted-foreground">
                         {post.readTime} min read
                       </span>
                     ) : null}
@@ -131,7 +131,7 @@ export function FeaturedWriting({
                 <div className="flex shrink-0 items-center gap-3">
                   {formattedDate ? (
                     <time
-                      className="font-mono text-[11px] text-muted-foreground sm:text-right"
+                      className="text-[11px] text-muted-foreground sm:text-right"
                       dateTime={post.publishedAt ?? ""}
                     >
                       {formattedDate}

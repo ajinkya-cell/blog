@@ -52,7 +52,7 @@ function StateFrame({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 const ACTION_CLASS =
-  "focus-ring inline-flex min-h-11 w-max shrink-0 items-center rounded-none border border-foreground px-3 font-mono text-foreground text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background";
+  "focus-ring inline-flex min-h-11 w-max shrink-0 items-center rounded-none border border-foreground px-3 text-foreground text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background";
 
 function EmptySearchState({
   query,

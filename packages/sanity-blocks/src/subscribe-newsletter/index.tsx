@@ -34,7 +34,7 @@ function SubscribeNewsletterButton() {
   return (
     <Button
       aria-label={pending ? "Subscribing..." : "Subscribe to newsletter"}
-      className="popout-btn-active shrink-0 rounded-xl px-5 py-2 font-mono text-xs font-semibold shadow-sm transition-transform active:scale-95"
+      className="popout-btn-active shrink-0 rounded-xl px-5 py-2 text-xs font-semibold shadow-sm transition-transform active:scale-95"
       disabled={pending}
       size="sm"
       type="submit"
@@ -88,10 +88,7 @@ function TestimonialPanel({
               </span>
             )}
             {authorRole && (
-              <span
-                className="font-mono text-muted-foreground text-xs"
-                data-inline-edit
-              >
+              <span className="text-muted-foreground text-xs" data-inline-edit>
                 {authorRole}
               </span>
             )}
@@ -161,7 +158,7 @@ export function SubscribeNewsletter({
               >
                 <input
                   aria-label="Email address"
-                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 font-mono text-foreground text-xs outline-none placeholder:text-muted-foreground"
+                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-foreground text-xs outline-none placeholder:text-muted-foreground"
                   name="email"
                   placeholder="Enter your email address"
                   required

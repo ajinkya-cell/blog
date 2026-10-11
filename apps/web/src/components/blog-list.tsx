@@ -43,7 +43,7 @@ export function BlogList({ blogs }: Readonly<BlogListProps>) {
         <section aria-labelledby={`year-${year}`} key={year}>
           <div className="mb-4 flex items-center gap-4">
             <h2
-              className="font-mono font-semibold text-muted-foreground text-sm tracking-wider"
+              className="font-semibold text-muted-foreground text-sm tracking-wider"
               id={`year-${year}`}
             >
               {year}

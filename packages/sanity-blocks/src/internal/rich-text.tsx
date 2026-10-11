@@ -1,7 +1,7 @@
 import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/tailwind-config/utils";
 import katex from "katex";
-import { Download } from "lucide-react";
+import { Download, Info, Lightbulb, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import {
   PortableText,
@@ -10,8 +10,10 @@ import {
 } from "next-sanity";
 import { CodeBlock } from "./code-block";
 import { CodeGroupBlock, type CodeGroupFile } from "./code-group-block";
+import { ExpandableBlock } from "./expandable-block";
 import { headingChildrenToSlug as parseChildrenToSlug } from "./heading-slug";
 import { getPlaygroundEmbedUrl } from "./playground-embed-url";
+import { PullQuote } from "./pull-quote";
 import { sanitizeHref } from "./safe-href";
 import { SanityImage } from "./sanity-image";
 import { TableBlock } from "./table-block";
@@ -32,8 +34,40 @@ function formatBytes(bytes?: number | null): string {
   return `${(bytes / 1024 ** i).toFixed(1)} ${units[i]}`;
 }
 
+type CalloutTone = "info" | "tip" | "warning";
+
+// Only the rule, wash, icon and title take the hue — body copy stays on the
+// foreground ink so every tone is readable in both themes.
+const CALLOUT_TONES: Record<
+  CalloutTone,
+  { icon: typeof Info; label: string; className: string }
+> = {
+  info: {
+    icon: Info,
+    label: "Note",
+    className:
+      "bg-callout-info/[0.06] text-callout-info before:bg-callout-info",
+  },
+  tip: {
+    icon: Lightbulb,
+    label: "Tip",
+    className: "bg-callout-tip/[0.07] text-callout-tip before:bg-callout-tip",
+  },
+  warning: {
+    icon: TriangleAlert,
+    label: "Warning",
+    className:
+      "bg-callout-warn/[0.08] text-callout-warn before:bg-callout-warn",
+  },
+};
+
+function calloutTone(type: unknown): CalloutTone {
+  return type === "tip" || type === "warning" ? type : "info";
+}
+
 const components: Partial<PortableTextReactComponents> = {
   block: {
+    blockquote: ({ children }) => <PullQuote>{children}</PullQuote>,
     // The Studio only offers H2–H6, but the schema doesn't police what's
     // already stored — seeded, imported or migrated blocks can still carry
     // `style: "h1"`, and @portabletext/react's default would render a real
@@ -103,7 +137,7 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-md border border-white/[0.08] bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[0.85em] text-foreground/90 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] before:content-none after:content-none lg:whitespace-nowrap">
+      <code className="rounded-md border border-border/70 bg-foreground/[0.05] px-1.5 py-0.5 font-mono text-[0.85em] text-foreground/90 before:content-none after:content-none lg:whitespace-nowrap">
         {children}
       </code>
     ),
@@ -205,47 +239,34 @@ const components: Partial<PortableTextReactComponents> = {
       if (!value?.content) {
         return null;
       }
-      const type = value.type ?? "info";
+      const content =
+        typeof value.content === "string" ? (
+          <p className="whitespace-pre-line">{value.content}</p>
+        ) : Array.isArray(value.content) ? (
+          <PortableText
+            components={components}
+            value={value.content as PortableTextBlock[]}
+          />
+        ) : null;
+      if (value.type === "quote") {
+        return <PullQuote author={value.title}>{content}</PullQuote>;
+      }
+      const tone = CALLOUT_TONES[calloutTone(value.type)];
+      const Icon = tone.icon;
       return (
         <aside
           className={cn(
-            "recessed-well not-prose my-6 rounded-2xl border p-5 text-sm leading-relaxed",
-            type === "warning" && "border-amber-500/30 text-amber-200/90",
-            type === "tip" && "border-emerald-500/30 text-emerald-200/90",
-            type === "quote" &&
-              "border-purple-500/30 italic text-purple-200/90",
-            type === "info" && "border-blue-500/30 text-blue-200/90"
+            "not-prose relative my-8 overflow-hidden rounded-xl border border-border/60 py-4 pr-5 pl-6 before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:content-['']",
+            tone.className
           )}
         >
-          <div className="mb-2.5 flex items-center gap-2">
-            <span
-              className={cn(
-                "rounded-full px-2.5 py-0.5 font-bold font-mono text-[10px] tracking-wider uppercase",
-                type === "warning" &&
-                  "border border-amber-500/30 bg-amber-500/15 text-amber-400",
-                type === "tip" &&
-                  "border border-emerald-500/30 bg-emerald-500/15 text-emerald-400",
-                type === "quote" &&
-                  "border border-purple-500/30 bg-purple-500/15 text-purple-400",
-                type === "info" &&
-                  "border border-blue-500/30 bg-blue-500/15 text-blue-400"
-              )}
-            >
-              {value.title || type}
-            </span>
+          <p className="mb-1.5 flex items-center gap-2 font-semibold text-sm">
+            <Icon aria-hidden="true" className="size-4 shrink-0" />
+            <span>{value.title || tone.label}</span>
+          </p>
+          <div className="text-[0.95rem] text-foreground/85 leading-7 [&_a]:text-foreground [&_a]:underline [&_a]:underline-offset-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-3 [&_p]:m-0 [&_ul]:list-disc [&_ul]:pl-5">
+            {content}
           </div>
-          {typeof value.content === "string" ? (
-            <p className="m-0 whitespace-pre-line text-foreground/90">
-              {value.content}
-            </p>
-          ) : Array.isArray(value.content) ? (
-            <div className="text-foreground/90 [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
-              <PortableText
-                components={components}
-                value={value.content as PortableTextBlock[]}
-              />
-            </div>
-          ) : null}
         </aside>
       );
     },
@@ -255,7 +276,7 @@ const components: Partial<PortableTextReactComponents> = {
         return (
           <div
             aria-hidden="true"
-            className="not-prose my-12 select-none text-center font-mono text-base tracking-[0.6em] text-muted-foreground"
+            className="not-prose my-12 select-none text-center text-base tracking-[0.6em] text-muted-foreground"
           >
             · · ·
           </div>
@@ -265,7 +286,7 @@ const components: Partial<PortableTextReactComponents> = {
         return (
           <div
             aria-hidden="true"
-            className="not-prose my-12 select-none text-center font-mono text-sm tracking-[0.5em] text-muted-foreground"
+            className="not-prose my-12 select-none text-center text-sm tracking-[0.5em] text-muted-foreground"
           >
             ✦ ✦ ✦
           </div>
@@ -278,16 +299,9 @@ const components: Partial<PortableTextReactComponents> = {
         return null;
       }
       return (
-        <blockquote className="site-chassis not-prose relative my-10 overflow-hidden rounded-2xl p-6 sm:p-8 font-sans">
-          <p className="text-balance font-sans text-2xl text-foreground font-normal italic leading-relaxed sm:text-3xl">
-            "{value.text}"
-          </p>
-          {value.attribution && (
-            <cite className="mt-4 block font-mono text-muted-foreground text-xs uppercase tracking-wider not-italic">
-              — {value.attribution}
-            </cite>
-          )}
-        </blockquote>
+        <PullQuote author={value.attribution}>
+          <p>{value.text}</p>
+        </PullQuote>
       );
     },
     videoEmbed: ({ value }) => {
@@ -310,7 +324,7 @@ const components: Partial<PortableTextReactComponents> = {
             />
           </div>
           {value?.caption && (
-            <figcaption className="border-border/40 border-t bg-foreground/[0.02] p-2.5 text-center font-mono text-muted-foreground text-xs">
+            <figcaption className="border-border/40 border-t bg-foreground/[0.02] p-2.5 text-center text-muted-foreground text-xs">
               {value.caption}
             </figcaption>
           )}
@@ -353,14 +367,14 @@ const components: Partial<PortableTextReactComponents> = {
                 </p>
               )}
               {meta && (
-                <span className="font-mono text-[10px] text-muted-foreground uppercase">
+                <span className="text-[10px] text-muted-foreground uppercase">
                   {meta}
                 </span>
               )}
             </div>
           </div>
           <a
-            className="popout-btn-inactive shrink-0 rounded-xl px-3.5 py-1.5 font-mono text-xs text-foreground transition-all hover:text-white"
+            className="popout-btn-inactive shrink-0 rounded-xl px-3.5 py-1.5 text-xs text-foreground transition-all hover:text-white"
             download={value.originalFilename || true}
             href={value.url}
             rel="noopener noreferrer"
@@ -388,7 +402,7 @@ const components: Partial<PortableTextReactComponents> = {
         <figure className="recessed-well not-prose my-8 overflow-x-auto rounded-2xl border border-border/40 p-5 text-center">
           <div dangerouslySetInnerHTML={{ __html: html }} />
           {value.caption && (
-            <figcaption className="mt-3 font-mono text-muted-foreground text-xs">
+            <figcaption className="mt-3 text-muted-foreground text-xs">
               {value.caption}
             </figcaption>
           )}
@@ -400,28 +414,17 @@ const components: Partial<PortableTextReactComponents> = {
         return null;
       }
       return (
-        <details
-          className="group site-chassis not-prose relative my-6 overflow-hidden rounded-2xl p-4 transition-colors"
-          open={value.defaultOpen}
+        <ExpandableBlock
+          defaultOpen={value.defaultOpen}
+          summary={value.summary}
         >
-          <summary className="flex cursor-pointer select-none items-center justify-between font-medium text-foreground text-sm list-none [&::-webkit-details-marker]:hidden">
-            <span>{value.summary}</span>
-            <span
-              aria-hidden="true"
-              className="font-mono text-muted-foreground text-xs transition-transform duration-200 group-open:rotate-180"
-            >
-              ▼
-            </span>
-          </summary>
-          {Array.isArray(value.content) && value.content.length > 0 && (
-            <div className="recessed-well mt-3 rounded-xl border border-white/[0.04] p-3 text-muted-foreground text-sm leading-relaxed [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
-              <PortableText
-                components={components}
-                value={value.content as PortableTextBlock[]}
-              />
-            </div>
-          )}
-        </details>
+          {Array.isArray(value.content) && value.content.length > 0 ? (
+            <PortableText
+              components={components}
+              value={value.content as PortableTextBlock[]}
+            />
+          ) : null}
+        </ExpandableBlock>
       );
     },
     playgroundEmbed: ({ value }) => {
@@ -447,7 +450,7 @@ const components: Partial<PortableTextReactComponents> = {
             />
           </div>
           {value?.title && (
-            <figcaption className="border-border/40 border-t bg-foreground/[0.02] p-2.5 text-center font-mono text-muted-foreground text-xs">
+            <figcaption className="border-border/40 border-t bg-foreground/[0.02] p-2.5 text-center text-muted-foreground text-xs">
               {value.title}
             </figcaption>
           )}

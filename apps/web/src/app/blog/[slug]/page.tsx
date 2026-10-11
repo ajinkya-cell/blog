@@ -22,19 +22,15 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { AuthorBioCard } from "@/components/author-bio-card";
 import { BreadcrumbsJsonLd } from "@/components/breadcrumbs";
-import { CollapsibleTableOfContent } from "@/components/elements/table-of-content";
+import { FloatingTableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
-import { PostNavigation, type PostLinkItem } from "@/components/post-navigation";
-import { ReadingProgress } from "@/components/reading-progress";
-import { seoFromDocument } from "@/lib/seo";
 import {
-  estimateReadingTime,
-  formatDate,
-  getBaseUrl,
-  PLACEHOLDER_SLUG,
-} from "@/utils";
+  PostNavigation,
+  type PostLinkItem,
+} from "@/components/post-navigation";
+import { seoFromDocument } from "@/lib/seo";
+import { estimateReadingTime, formatDate, PLACEHOLDER_SLUG } from "@/utils";
 
 const logger = new Logger("BlogSlug");
 
@@ -194,11 +190,9 @@ function BlogPageContent({
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(_updatedAt);
   const estimatedMinutes = readTime ?? estimateReadingTime(richText);
-  const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
 
   return (
     <main className="bg-background font-sans text-foreground antialiased">
-      <ReadingProgress />
       <ArticleJsonLd article={data} />
       <BreadcrumbsJsonLd
         crumbs={[
@@ -208,7 +202,7 @@ function BlogPageContent({
         ]}
       />
 
-      <div className="container max-w-4xl pt-8 pb-24 sm:pt-12 md:pb-32">
+      <div className="container max-w-4xl pt-8 pb-8 sm:pt-12 md:pb-12">
         {/* Top Featured Hero Image with Bottom Fade */}
         {image?.id ? (
           <div className="relative mx-auto mb-10 w-full overflow-hidden rounded-2xl border border-border/40 shadow-sm sm:mb-12 sm:rounded-3xl">
@@ -234,7 +228,7 @@ function BlogPageContent({
             <div className="flex flex-wrap items-center justify-center gap-2">
               {tags.map((tag) => (
                 <span
-                  className="rounded-full border border-border/60 bg-muted/60 px-3 py-0.5 font-mono text-muted-foreground text-xs"
+                  className="rounded-full border border-border/60 bg-muted/60 px-3 py-0.5 text-muted-foreground text-xs"
                   key={tag}
                 >
                   #{tag}
@@ -262,7 +256,7 @@ function BlogPageContent({
                     />
                   </span>
                 ) : (
-                  <span className="flex size-7 items-center justify-center rounded-full bg-muted font-mono text-xs">
+                  <span className="flex size-7 items-center justify-center rounded-full bg-muted text-xs">
                     {author.name.charAt(0)}
                   </span>
                 )}
@@ -286,34 +280,24 @@ function BlogPageContent({
               </div>
             ) : null}
 
-            <div className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span>Read time:</span>
               <span className="text-foreground/90">{estimatedMinutes} min</span>
             </div>
           </div>
         </header>
 
-        {/* Centered Blog Article & Collapsible Table of Contents */}
+        {/* Centered Blog Article — the table of contents floats bottom-right */}
+        <FloatingTableOfContent richText={richText ?? []} />
         <div className="mx-auto mt-10 flex w-full max-w-3xl flex-col gap-10 sm:mt-12">
-          {/* Collapsible Table of Contents */}
-          <CollapsibleTableOfContent
-            richText={richText ?? []}
-            shareTitle={title}
-            shareUrl={shareUrl}
-          />
-
           {/* Main Article Content */}
           <article className="min-w-0 font-sans">
             <RichText
-              className="prose-lg font-sans prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
+              className="prose-lg font-sans prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8"
               richText={richText as RichTextValue}
             />
 
-            <div className="mt-16 border-border border-t pt-12">
-              <AuthorBioCard author={author} />
-            </div>
-
-            <div className="mt-12">
+            <div className="mt-12 border-border border-t pt-8">
               <PostNavigation
                 next={adjacent?.next}
                 previous={adjacent?.previous}

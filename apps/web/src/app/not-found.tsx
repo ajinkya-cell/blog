@@ -3,9 +3,9 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center px-6 py-24">
+    <main className="flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center px-6 py-12">
       <div className="grid w-full max-w-2xl justify-items-center gap-8 text-center">
-        <div className="inline-flex items-center gap-2.5 border border-border px-3 py-1.5 font-light font-mono text-foreground text-sm uppercase tracking-[0.28px]">
+        <div className="inline-flex items-center gap-2.5 border border-border px-3 py-1.5 font-light text-foreground text-sm uppercase tracking-[0.28px]">
           <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
           <span>Not found</span>
         </div>
@@ -24,7 +24,7 @@ export default function NotFound() {
 
         <Button
           asChild
-          className="h-9 rounded-full px-4 font-mono font-normal text-sm uppercase tracking-wide"
+          className="h-9 rounded-full px-4 font-normal text-sm uppercase tracking-wide"
           size="sm"
           variant="secondary"
         >

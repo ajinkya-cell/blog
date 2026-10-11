@@ -57,7 +57,7 @@ export function PersonalHero({
 
           <div className="flex flex-1 flex-col gap-4">
             {statusPill ? (
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 font-medium font-mono text-emerald-400 text-xs shadow-[inset_0_1px_2px_rgba(16,185,129,0.15)]">
+              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 font-medium text-emerald-400 text-xs shadow-[inset_0_1px_2px_rgba(16,185,129,0.15)]">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />

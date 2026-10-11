@@ -57,7 +57,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
             />
           </div>
         ) : (
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-foreground/15 bg-foreground font-bold font-mono text-background text-xl shadow-md md:size-20">
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-foreground/15 bg-foreground font-bold text-background text-xl shadow-md md:size-20">
             {name.charAt(0)}
           </div>
         )}
@@ -67,7 +67,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-semibold text-foreground text-lg">{name}</h3>
               {position ? (
-                <span className="font-mono text-muted-foreground text-xs">
+                <span className="text-muted-foreground text-xs">
                   · {position}
                 </span>
               ) : null}
@@ -87,13 +87,13 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
 
           <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
             {location ? (
-              <span className="recessed-well inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
+              <span className="recessed-well inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-muted-foreground">
                 <MapPin className="size-3" />
                 {location}
               </span>
             ) : null}
             {status ? (
-              <span className="recessed-well inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] text-emerald-400">
+              <span className="recessed-well inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-emerald-400">
                 <Sparkles className="size-3 text-amber-400" />
                 {status}
               </span>
@@ -104,7 +104,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
             <div className="mt-2 flex flex-wrap items-center gap-2 pt-2 text-sm">
               {socialLinks.github && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={socialLinks.github}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -114,7 +114,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
               )}
               {socialLinks.twitter && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={socialLinks.twitter}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -124,7 +124,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
               )}
               {socialLinks.bluesky && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={socialLinks.bluesky}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -134,7 +134,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
               )}
               {socialLinks.linkedin && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={socialLinks.linkedin}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -144,7 +144,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
               )}
               {socialLinks.website && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={socialLinks.website}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -155,7 +155,7 @@ export function AuthorBioCard({ author, className }: Readonly<AuthorBioProps>) {
               )}
               {socialLinks.email && (
                 <Link
-                  className="popout-btn-inactive inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-mono text-xs transition-colors hover:text-foreground"
+                  className="popout-btn-inactive inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs transition-colors hover:text-foreground"
                   href={`mailto:${socialLinks.email}`}
                 >
                   <Mail className="size-3" />

@@ -33,7 +33,7 @@ function TableCell({
     <CellTag
       className={
         isHeader
-          ? "border-border/40 border-b px-4 py-3 text-left font-mono font-semibold text-muted-foreground text-xs uppercase tracking-wider"
+          ? "border-border/40 border-b px-4 py-3 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wider"
           : "border-border/20 border-b px-4 py-3 text-left text-foreground/80 align-top last:border-b-0"
       }
       scope={isHeader ? "col" : undefined}

@@ -204,7 +204,7 @@ export function CommandPalette({
           {searchQuery.trim() ? (
             results.length > 0 ? (
               <div className="flex flex-col gap-1">
-                <div className="px-3 py-1 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="px-3 py-1 text-[10px] text-muted-foreground uppercase tracking-wider">
                   Articles
                 </div>
                 {results.map((post, idx) => {
@@ -249,7 +249,7 @@ export function CommandPalette({
             )
           ) : (
             <div className="flex flex-col gap-1">
-              <div className="px-3 py-1 font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+              <div className="px-3 py-1 text-[10px] text-muted-foreground uppercase tracking-wider">
                 Quick Navigation
               </div>
               {defaultLinks.map((item, idx) => {
@@ -291,23 +291,23 @@ export function CommandPalette({
         </div>
 
         {/* Footer shortcuts */}
-        <div className="flex items-center justify-between border-border border-t bg-muted/40 px-4 py-2 font-mono text-[10px] text-muted-foreground">
+        <div className="flex items-center justify-between border-border border-t bg-muted/40 px-4 py-2 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+              <kbd className="rounded border border-border bg-background px-1 py-0.5">
                 ↑↓
               </kbd>{" "}
               navigate
             </span>
             <span>
-              <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+              <kbd className="rounded border border-border bg-background px-1 py-0.5">
                 ↵
               </kbd>{" "}
               select
             </span>
           </div>
           <span>
-            <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+            <kbd className="rounded border border-border bg-background px-1 py-0.5">
               esc
             </kbd>{" "}
             close

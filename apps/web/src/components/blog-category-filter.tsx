@@ -23,7 +23,7 @@ export function BlogCategoryFilter({
           <Link
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "inline-flex items-center rounded-lg px-3 py-1.5 font-mono text-xs tracking-wide transition-all",
+              "inline-flex items-center rounded-lg px-3 py-1.5 text-xs tracking-wide transition-all",
               isActive
                 ? "popout-btn-active font-semibold shadow-sm"
                 : "popout-btn-inactive hover:bg-foreground/5 hover:text-foreground"

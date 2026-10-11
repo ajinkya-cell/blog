@@ -81,7 +81,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
           {media}
         </span>
       </div>
-      <span className="absolute bottom-3 left-3 flex max-w-[calc(100%-1.5rem)] items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-mono text-foreground/80 text-xs uppercase tracking-wider transition-colors duration-200 group-hover:border-white/20 group-hover:text-white">
+      <span className="absolute bottom-3 left-3 flex max-w-[calc(100%-1.5rem)] items-center rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-foreground/80 text-xs uppercase tracking-wider transition-colors duration-200 group-hover:border-white/20 group-hover:text-white">
         <span className="min-w-0 truncate">{displayLabel}</span>
         {href ? (
           <ArrowRight

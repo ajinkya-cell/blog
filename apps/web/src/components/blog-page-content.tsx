@@ -38,7 +38,7 @@ export function BlogPageContent({
       <BreadcrumbsJsonLd
         crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
       />
-      <div className="container mt-8 mb-16 max-w-6xl md:my-16">
+      <div className="container mt-8 mb-8 max-w-6xl md:mt-12 md:mb-10">
         <BlogHeader description={description} title={title} />
 
         <BlogSearchLayout

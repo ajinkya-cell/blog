@@ -14,7 +14,7 @@ export function TweetEmbed({ url, caption }: Readonly<TweetEmbedProps>) {
     <figure className="not-prose my-8 flex flex-col items-center">
       <div className="site-chassis w-full max-w-lg overflow-hidden rounded-2xl border border-border/40 p-5">
         <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-mono text-muted-foreground text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <XIcon className="size-4 text-foreground" />
             <span>Post on X</span>
           </div>
@@ -25,7 +25,7 @@ export function TweetEmbed({ url, caption }: Readonly<TweetEmbedProps>) {
           </p>
         ) : null}
         <a
-          className="font-mono text-xs text-foreground/80 underline underline-offset-4 hover:text-foreground"
+          className="text-xs text-foreground/80 underline underline-offset-4 hover:text-foreground"
           href={url}
           rel="noopener noreferrer"
           target="_blank"

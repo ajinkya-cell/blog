@@ -7,7 +7,7 @@ import {
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";
-import { Geist_Mono, Instrument_Serif, Inter } from "next/font/google";
+import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
 import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
@@ -19,6 +19,7 @@ import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { ScrollWater } from "@/components/scroll-water";
 import { VisualEditingLayer } from "@/components/visual-editing-layer";
 import { getNavigationData } from "@/lib/navigation";
 
@@ -27,7 +28,7 @@ const fontSans = Inter({
   variable: "--font-sans",
 });
 
-const fontMono = Geist_Mono({
+const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
@@ -59,6 +60,7 @@ export default async function RootLayout({
         </noscript>
         <Providers>
           <ScrollToTop />
+          <ScrollWater />
           <div className="relative flex min-h-dvh flex-col bg-background">
             {/* Session-gated, not environment-gated, so the deployed Studio can
                 edit the nav; the published fallback keeps real content in the
